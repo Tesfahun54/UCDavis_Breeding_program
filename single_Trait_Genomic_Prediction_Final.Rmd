@@ -869,10 +869,17 @@ all(rownames(combGmat) %in% unique(dat_F$germplasmName))
 
 ```{r}
 ############################################
-# five fold cross validation 
+# five fold cross validation - I - 
 ##########################################
+# The TRUE mean - estimated 
+# 1. Trials with spatial 
+# 2. Trial Without spatial 
+# 3. Single replicated 
+# Finally all combined together in the second step to estimate the TRUE mean values 
+#4.The GBLUP fitted using the Final mean estimated 
 # The BlUE data across trials
-BLUE_Means_Over_Trials_wide
+
+BLUE_Means_Over_Trials_wide # The TRUE mean values 
 # The combined relationship matrix 
 combGmat = read.csv("CombGmat_UCDavis_prog.csv") # read the combinde relationship matrix 
 combGmat # combined relationship matrix 
@@ -957,8 +964,11 @@ ggplot(data = Pred_Accu, mapping = aes(x = Trait, y = Accuracy, fill = Trait)) +
 ```
 ```{r}
 ###################################
-# single step genomic prediction 
+# single step genomic prediction - Cross Validation II
 ###################################
+# The TRUE mean value estimated 
+# 1. fit all the data together to estimate the TRUE mean value in a single step
+# 2. GBLUP also done in single step
 # The combined relationship matrix 
 dat_F$studyName = as.factor(dat_F$studyName)
 dat_F$germplasmName = as.factor(dat_F$germplasmName)
@@ -1077,7 +1087,7 @@ CombGmat1 = CombGmat[mrk1,mrk1]
                                  rcov=~vsr(units),
                                  data= train.data)")))
 
-   #estimationof effects
+   #estimation of effects
    genoUef = as.matrix(ans$U$`u:germplasmName`[[Trait]])
    genoUef= as.data.frame(genoUef)
    genoUef$geno = rownames(genoUef)
@@ -1132,11 +1142,12 @@ ggplot(data = Accuracy_ST_Comb, mapping = aes(x = Trait, y = Accuracy, fill = Tr
 
 ```{r}
 ###############################################################
+# Cross validation III
 # Two step GBLUP cross validation - BLUE mean estimated without spatial analysis in a single setp 
 #################################################################
-#The TRUE values estiamted at one time 
-#Checking the reason for the different on predictability single step and two step GBLUP
-#Estimate the over all mean - without considering the spatial analysis
+# 1. The TRUE mean value estimate - in a single step - without spatial analysis 
+# 2. This mean used in GBLUP
+
 library(LMMsolver)
 BLUE_Mean_allTrials_wosp <- tibble()
 
@@ -1237,10 +1248,14 @@ ggplot(data = Pred_Accu1, mapping = aes(x = Trait, y = Accuracy, fill = Trait)) 
 
 ```
 ```{r}
+###############################################
+# Cross validation _IV
 #Two step analysis - the True BLUE mean estimated - from individual location mean
-
 ##############################
-# BLUE mean prediction - 
+#1. The Blue mean of the replicated trials estimated 
+# 2. the values of the un-replicated trial organized 
+# 3. The the above two data merged for the TRUE mean value estimation 
+# 4. GBLUP done with the above TRUE mean value 
 
 Trials_WO_sp # list of trials without spatial information 
 data_Tr_WO_sp = droplevels(dat_F[dat_F$studyName %in% Trials_WO_sp, ])
