@@ -1,5 +1,5 @@
 ---
-title: "Single trait genomic selection using BGLR"
+title: "Single trait genomic selection or prediction"
 author: "Tesfahun A. Setotaw"
 date: "2023-08-17"
 output: html_document:
@@ -13,7 +13,7 @@ opts_knit$set(root.dir = "/Users/tas286/Documents/GitHub/Genomic_selection_wheat
 
 ```
 ```{r}
-# Load package necessry for the anlaysis 
+# Load package necessary for the analysis 
 library(BGLR)
 library(sommer)
 library(lme4)
@@ -40,7 +40,7 @@ dat_F$Grain_Yield = dat_F$Grain.yield...kg.ha.CO_321.0001218
 dat_F$Grain_Protein = dat_F$Grain.protein.content......CO_321.0001205
 dat_F$TKW = dat_F$Grain.weight...1000.kernels...g.1000.grain.CO_321.0001213
 dat_F$Heading_time = dat_F$Heading.time...Julian.date..JD..CO_321.0001233
-which(dat_F$Test_weight <5)
+which(dat_F$Test_weight <5) #
 dat_F[1015,"Test_weight"] = NA
 # Quality Control for the data (QC steps)
 # 1. boxplot for the trials for each traits 
@@ -55,10 +55,10 @@ ggsave(filename = paste(c(Trait,"boxplot.png"),collapse  = "_"))
 ```
 
 ```{r}
-#Checking for the distribuition of the NA in each trials 
-
-Trials1 = unique(dat_F$studyName)
-out = vector(mode = "list", length = length(Trials1))
+#Checking for the distribution of the NA in each trials 
+summary(dat_F)
+Trials = unique(dat_F$studyName)
+out = vector(mode = "list", length = length(Trials))
 names(out) <- Trials1
 Traits =  c("Plant_height", "Test_weight", "Grain_Yield", "Grain_Protein", "TKW", "Heading_time") # the list of traits with NA values 
 #Creating the list within the list to put the observations of each trait
@@ -83,7 +83,7 @@ names(summNA) <- Trials
 library(plyr)
 for (Trial in Trials) {
   for(Trait in Traits){
-  # dtt = dat_F[dat_F$studyName == Trial,]
+  dtt = dat_F[dat_F$studyName == Trial,]
   tt <- as.data.frame(out[[Trial]][[Trait]])
   if(length(colnames(tt)) > 2){
   pt = apply(X = tt, MARGIN = 2, FUN = is.na) # identify trials with NA
@@ -96,7 +96,7 @@ for (Trial in Trials) {
 }
 }
 #Join the data in the list in one dataframe 
-Traits1 = c(Traits2)
+
 dd_join = data.frame()
 
 for(Trial in Trials){
@@ -130,11 +130,11 @@ head(dat_M1[,1:10])
 
 id1 = which(dat_F$germplasmName %in% colnames(dat_M)) # identify the accessions with phenotype and marker data (genotyping protocol 1)
 id2 = which(dat_F$germplasmName %in% colnames(dat_M1)) # identify the accessions with phenotype and marker data (genotyping protocol 2)
-dat_coM = dat_F[c(id1,id2),] # the total number of genotype with phebnotype and marker data 
+dat_coM = dat_F[c(id1,id2),] # the total number of genotype with phenotype and marker data 
 all(unique(dat_coM$studyName) %in% unique(dat_F$studyName)) # check if all trials represented in the selected fraction with marker data
 unique(dat_F$studyName) %in% unique(dat_coM$studyName)
-which(unique(colnames(dat_M1)[-1] %in% colnames(dat_M)[-1])) # check if the genotyping protocol1 and protocol2 have similar marker name
-head(dat_M[,1:10])
+which(unique(dat_M1$Marker %in% dat_M$Marker)) # check if the genotyping protocol1 and protocol2 have similar marker name
+
 length(which(dat_M$Marker %in% dat_M1$Marker)) # the length of the intersection with the two protocols 
 length(unique(dat_M$Marker))# the number of markers in protocol 1 
 length(unique(dat_M1$Marker)) # the number of markers in protocol2
@@ -142,40 +142,30 @@ length(unique(dat_M1$Marker)) # the number of markers in protocol2
 idg = which(unique(dat_F$germplasmName) %in% c(colnames(dat_M1)[-1], colnames(dat_M)[-1])) # The number of marker with phenotype and marker data 
 list_geno_wo_marker = unique(dat_F$germplasmName)[-idg] # list of accessions without marker data
 data.frame(list_geno_wo_marker)
-length(colnames(dat_M1))
+
+
+
+
 # identify accession with marker data in each year 
-dat_2020 <- dat_F[dat_F$studyYear%in% 2020,] # sub-setting using year
-length(unique(dat_2020$germplasmName)) # the number of accessions 
-length(unique(dat_2020$studyName)) # the number of trials 
-length(which(unique(dat_2020$germplasmName) %in% colnames(dat_M))) # identify accession with marker data (protocol 1)
-length(which(unique(dat_2020$germplasmName) %in% colnames(dat_M1))) # identify accession with marker data (protocol 2)
+years = c("2020", "2021", "2022")
+Marker_by_year = tibble()
+for(i in years){
+  dat_y<- dat_F[dat_F$studyYear == i,] # sub-setting using year
+  No_acc = length(unique(dat_y$germplasmName)) # the number of accessions 
+  No_trial = length(unique(dat_y$studyName)) # the number of trials 
+  Acc_M1 = length(which(unique(dat_y$germplasmName) %in% colnames(dat_M))) # identify accession with marker data (protocol 1)
+  Acc_M2 = length(which(unique(dat_y$germplasmName) %in% colnames(dat_M1))) # identify accession with marker data (protocol 2)
+  
+id1 = which(unique(dat_y$germplasmName) %in% colnames(dat_M))
+id2 = which(unique(dat_y$germplasmName) %in% colnames(dat_M1))
+Acc_M1M2 = length(which(unique(dat_y$germplasmName)[id1] %in% unique(dat_y$germplasmName)[id2])) # accession with two genotyping protocol
+acce_Mark = cbind(Year = i, No_of_accession = No_acc, No_trial = No_trial, Acc_genoProtocol1 = Acc_M1, Acc_genoProtocol2 = Acc_M2, Acc_Both_protocols = Acc_M1M2 )
 
-id1 = which(unique(dat_2020$germplasmName) %in% colnames(dat_M))
-id2 = which(unique(dat_2020$germplasmName) %in% colnames(dat_M1))
-length(which(unique(dat_2020$germplasmName)[id1] %in% unique(dat_2020$germplasmName)[id2])) # accession with two genotyping protocol
+Marker_by_year = rbind(Marker_by_year, acce_Mark)
 
-summary(dat_2020)
-dat_2021 <- dat_F[dat_F$studyYear%in% 2021,] # for year 2021
-length(unique(dat_2021$germplasmName))
-length(unique(dat_2021$studyName))
-length(which(unique(dat_2021$germplasmName) %in% colnames(dat_M)))
-length(which(unique(dat_2021$germplasmName) %in% colnames(dat_M1))) 
 
-id3 = which(unique(dat_2021$germplasmName) %in% colnames(dat_M))
-id4 = which(unique(dat_2021$germplasmName) %in% colnames(dat_M1))
-length(which(unique(dat_2021$germplasmName)[id3] %in% unique(dat_2021$germplasmName)[id4]))
-summary(dat_2021)
-
-dat_2022 <- dat_F[dat_F$studyYear%in% 2022,] # for year 2022
-length(unique(dat_2022$germplasmName))
-length(unique(dat_2022$studyName))
-length(which(unique(dat_2022$germplasmName) %in% colnames(dat_M)))
-length(which(unique(dat_2022$germplasmName) %in% colnames(dat_M1))) 
-id5 = which(unique(dat_2022$germplasmName) %in% colnames(dat_M))
-id6 = which(unique(dat_2022$germplasmName) %in% colnames(dat_M1))
-length(which(unique(dat_2022$germplasmName)[id3] %in% unique(dat_2022$germplasmName)[id4]))
-
-summary(dat_2022)
+}
+Marker_by_year
 
 ###########################
 # The accessions genotyped in each trial 
@@ -198,6 +188,9 @@ Acc_With_Mark_in_Trials$No_Accession_protocol2 = as.numeric(Acc_With_Mark_in_Tri
 Acc_With_Mark_in_Trials$No_common_Accessions = as.numeric(Acc_With_Mark_in_Trials$No_common_Accessions)
 Acc_With_Mark_in_Trials$Total_Genotyped = as.numeric(Acc_With_Mark_in_Trials$Total_Genotyped)
 Acc_With_Mark_in_Trials$Total_accessions = as.numeric(Acc_With_Mark_in_Trials$Total_accessions)
+
+######################################
+# Plotting the graph
 #Change the data to long type 
 Acc_With_Mark_in_Trials_long = tibble()
 for(i in colnames(Acc_With_Mark_in_Trials)[-1]){
@@ -262,6 +255,7 @@ write.csv(x = datsum, file = "Trial_vs_traits_summary_UCDAVIs_BreedingProg.csv")
 
 ```{r}
 ###########################################
+# Phenotypic data quality control
 #Estimate individual location heritability for replicated trials 
 ###########################################
 dat_F$studyName = as.factor(dat_F$studyName)
@@ -278,12 +272,12 @@ for(Trial in Trials){
   r = length(unique(dt$replicate))
 
   if(r > 1){
-    Trials1 = c(Trials1,Trial)
+    Trials1 = c(Trials1,Trial) # trials with more than one replication 
   }
 }
 
 #Trials with single rep trials 
-unique(dat_F$studyName)[!unique(dat_F$studyName) %in% Trials1]
+Trial_unrep = unique(dat_F$studyName)[!unique(dat_F$studyName) %in% Trials1]
 
 
 #####################################
@@ -297,16 +291,17 @@ if(ln > 0){
   Trial_spatial = c(Trial_spatial, Trial)
 }
 }
-
+Trial_spatial # Trials with spatial inforamtion 
 Trials_WO_sp = Trials1[!Trials1 %in% Trial_spatial] # The trials without spatial information 
 
 
 
 ##########################
-# Estimating heritability - without spatial correction for all the trials 
+# Estimating heritability - without spatial correction for all the trials with replications >1  
 #########################
 H2 <- tibble()
 BLUEMean = tibble() # Blue mean without spatial correction for all the trial 
+Varcomp = tibble()
 for(Trial in Trials1){
   dt = droplevels(dat_F[dat_F$studyName == Trial,])
   r = length(unique(dt$replicate))
@@ -327,7 +322,8 @@ for(Trait1 in Traits1){
       #removing outlier for replicated trials 
       eval(parse(text = paste("outl1 <- lmer(",Trait1,"~(1|germplasmName) + (1|replicate),
                data= dt)")))
-      
+  
+  
       outlier = which(abs(stats::rstudent(outl1)) > 3)
       if(length(outlier) == 0){
         dt1 = dt}else{
@@ -346,16 +342,19 @@ for(Trait1 in Traits1){
     h2 = vg/(vg + (ve/r))
     hert = cbind(Trial = paste(Trial), Trait = paste(Trait1), Heritability = round(h2,3))
     H2 = rbind(H2,hert)
+    vc = cbind(Trial = Trial, Trait = Trait1, vg = round(vg,3), ve = round(ve,3))
  ##Predicting the BLUE values
     eval(parse(text = paste( "av1 = mmer(fixed = ",Trait1," ~ germplasmName,
            random = ~ replicate,
            rcov = ~units, data = dt1)")))
-
+ 
 
  pp = predict(object = av1, D = "germplasmName")
  m1 = pp$pvals
  mean1 = cbind(Trial = Trial, Trait = Trait1, germplasmName = m1[,1], BLUE_mean = round(m1[,2],2))
  BLUEMean = rbind(BLUEMean, mean1)
+ 
+ Varcomp = rbind(Varcomp,vc)
   }
 }
 unique(BLUEMean$Trait)
@@ -363,12 +362,14 @@ unique(BLUEMean$Trait)
 unique(BLUEMean$Trial)
 
 H2
-
+Varcomp$ve = as.numeric(Varcomp$ve)
+Varcomp[order(Varcomp$Trait),]
 library(reshape2)
 H2$Heritability = as.numeric(H2$Heritability)
 H2dec50P = dcast(data = H2, formula = Trial ~ Trait, fun.aggregate = mean, value.var = "Heritability")
 write.csv(x = H2dec50P, file = "Heritability_for19Trials_50PNA.csv", row.names = F)
 ```
+
 
 ```{r}
 
@@ -380,6 +381,7 @@ Trials_WO_sp # list of trials without spatial information
 data_Tr_WO_sp = droplevels(dat_F[dat_F$studyName %in% Trials_WO_sp, ])
 
 BLUEMean_WO_SP = tibble()
+Varcomp_wo_sp = tibble()
 for(Trial in Trials_WO_sp){
   dt = droplevels(data_Tr_WO_sp[data_Tr_WO_sp$studyName == Trial,])
   r = length(unique(dt$replicate))
@@ -409,24 +411,46 @@ for(Trait1 in Traits1){
            random = ~ replicate,
            rcov = ~units, data = dt)")))
 
-
+#Extract the error variances
+    eval(parse(text = paste( "av2 = mmer(fixed = ",Trait1," ~ 1,
+           random = ~ germplasmName + replicate,
+           rcov = ~units, data = dt)")))
+    ss = summary(av2)
+    ss1 = ss$varcomp
+    rownames(ss1) <- c("germplasmName", "replicate","residual")
+    vg = ss1["germplasmName", "VarComp"]
+    ve = ss1["residual", "VarComp"]
+    vc = cbind(Trial = Trial, Trait = Trait1, vg = round(vg,3), ve = round(ve,3))
+  
+    #option 1
+    # fit = fitted(av1)
+    # head(fit$dataWithFitted %>% group_by(germplasmName) %>%
+    # summarise_at(.vars = "Xb.fitted",.funs = mean, na.rm = T))
  pp = predict(object = av1, D = "germplasmName")
  m1 = pp$pvals
- 
+ head(m1)
  mean1 = cbind(Trial = Trial, Trait = Trait1, germplasmName = m1[,1], BLUE_mean = round(m1[,2],2))
  BLUEMean_WO_SP = rbind(BLUEMean_WO_SP, mean1)
+ Varcomp_wo_sp = rbind(Varcomp_wo_sp,vc)
   }
 }
 str(BLUEMean_WO_SP)
 BLUEMean_WO_SP$BLUE_mean = as.numeric(BLUEMean_WO_SP$BLUE_mean)
+Varcomp_wo_sp[order(Varcomp_wo_sp$Trait), ]
+BLUEMean_WO_SP$BLUE_mean = as.numeric(BLUEMean_WO_SP$BLUE_mean)
+BLUEMean_WO_SP_wide = dcast(data = BLUEMean_WO_SP, formula = Trial + germplasmName ~Trait, fun.aggregate = mean, value.var = "BLUE_mean" , na.rm = T)
+summary(BLUEMean_WO_SP_wide)
+
 ggplot(BLUEMean_WO_SP, mapping = aes(x = Trial, y = BLUE_mean )) +
-  geom_boxplot()+ facet_wrap(~Trait, scales = "free") + theme(axis.text.x = element_text(angle = 90)) 
+  geom_boxplot()+ facet_wrap(~Trait, scales = "free") + theme(axis.text.x = element_text(angle = 90))
+
 ################################################
 # BLUE mean for trials with spatial information 
 #################################################
 Trial_spatial #Trial list with spatial analysis 
 
 data_Tr_With_Sp = droplevels(dat_F[dat_F$studyName %in% Trial_spatial,])
+summary(data_Tr_With_Sp)
 BLUEMean_With_SP = tibble()
 for(Trial in Trial_spatial){
   dt = droplevels(data_Tr_With_Sp[data_Tr_With_Sp$studyName == Trial,])
@@ -458,26 +482,47 @@ for(Trait1 in Traits1){
     eval(parse(text = paste( "av1 = mmer(fixed = ",Trait1," ~ germplasmName,
            random = ~ replicate +  spl2Da(rowNumber,colNumber),
            rcov = ~vsr(units), data = dt)")))
-
- genname = gsub(pattern = "germplasmName", replacement = "", av1$Beta$Effect)[-1] # genotypes in the mean 
- 
- ix = which(table(dt$germplasmName[which(is.na(dt[,Trait1]))])>1) # genotypes with NA values 
- genname_final = droplevels(unique(dt$germplasmName)[!unique(dt$germplasmName) %in% names(ix)]) # genotypes with the predicted mean 
- gno_int = droplevels(genname_final[!genname_final %in% genname]) # genotypes name of the intercept 
-
- GMean = av1$Beta[1,3] # The grande mean or the intercept
- av1$Beta[2:length(av1$Beta[,1]),3] = av1$Beta[2:length(av1$Beta[,1]),3] + GMean # predicted mean (intercept + effects)
- av1$Beta$Effect = as.character(av1$Beta$Effect) # change as character the effect coloumn
- av1$Beta[1,2] = as.character(gno_int) #replace the "intercept" with genotypes names
- av1$Beta$Effect = gsub(pattern = "germplasmName", replacement = "", x = av1$Beta$Effect) # remove the prefix germplasmName from the predicted mean
- colnames(av1$Beta)[2] = "germplasmName" # rename the coloumn Effect with germplasmName
- mean1 = cbind(Trial = Trial,av1$Beta) # save as mean1 
- colnames(mean1)[4] = "BLUE_mean"
- BLUEMean_With_SP = rbind(BLUEMean_With_SP, mean1) # save as a tibble 
+#################################################
+# Better method
+     fit1 = fitted(av1)
+     fited_mean = fit1$dataWithFitted
+     head(fited_mean)
+     BLUE_Adj = fited_mean %>% group_by(germplasmName) %>%
+       summarise_at(.vars = "Xb.fitted", .funs = mean, na.rm = T)
+     colnames(BLUE_Adj)[2] = "BLUE_mean"
+     BLUE_Adj = cbind(Trial = Trial, Trait = Trait1, BLUE_Adj)
+     
+     # BLUE_Adj$Group = "Without_spatial"
+    
+    
+#################################
+ #  genname = gsub(pattern = "germplasmName", replacement = "", av1$Beta$Effect)[-1] # genotypes in the mean
+ # 
+ # ix = which(table(dt$germplasmName[which(is.na(dt[,Trait1]))])>1) # genotypes with NA values
+ # genname_final = droplevels(unique(dt$germplasmName)[!unique(dt$germplasmName) %in% names(ix)]) # genotypes with the predicted mean
+ # gno_int = droplevels(genname_final[!genname_final %in% genname]) # genotypes name of the intercept
+ # 
+ # GMean = av1$Beta[1,3] # The grande mean or the intercept
+ # av1$Beta[2:length(av1$Beta[,1]),3] = av1$Beta[2:length(av1$Beta[,1]),3] + GMean # predicted mean (intercept + effects)
+ # av1$Beta$Effect = as.character(av1$Beta$Effect) # change as character the effect coloumn
+ # av1$Beta[1,2] = as.character(gno_int) #replace the "intercept" with genotypes names
+ # av1$Beta$Effect = gsub(pattern = "germplasmName", replacement = "", x = av1$Beta$Effect) # remove the prefix germplasmName from the predicted mean
+ # colnames(av1$Beta)[2] = "germplasmName" # rename the coloumn Effect with germplasmName
+ # mean1 = cbind(Trial = Trial,av1$Beta) # save as mean1
+ # colnames(mean1)[4] = "BLUE_mean"
+ # head(mean1)
+ # head(BLUE_Adj)
+ BLUEMean_With_SP = rbind(BLUEMean_With_SP, BLUE_Adj) # save as a tibble 
   }
 }
-BLUE_Mean_replicated = rbind(BLUEMean_With_SP, BLUEMean_WO_SP) # Combine the BLUE means with spatial and without spatial
-BLUE_Mean_replicated$BLUE_mean = as.numeric(BLUE_Mean_replicated$BLUE_mean)
+head(BLUEMean_With_SP)
+
+BLUEMean_With_SP$BLUE_mean = as.numeric(BLUEMean_With_SP$BLUE_mean)
+BLUEMean_With_SP_wide = dcast(data = BLUEMean_With_SP, formula = Trial + germplasmName ~ Trait, fun.aggregate = mean, 
+                              value.var = "BLUE_mean", na.rm = T)
+summary(BLUEMean_With_SP_wide)
+
+
 ggplot(BLUE_Mean_replicated, mapping = aes(x = Trial, y = BLUE_mean)) +
   geom_boxplot() + facet_wrap(~Trait, scales = "free")
 head(BLUE_Mean_replicated)
@@ -500,10 +545,10 @@ ggplot(dt, mapping = aes(x = germplasmName, y = Test_weight))+
 #Group 1. Heading time and plant height - Group1 Trials list single rep observation for these traits
 Trial_g1 = c("UCD20010", "UCD20013","UCD20014","UCD20015","UCD20016", "UCD20017","UCD21010", "UCD21011","UCD21013", "UCD21016","UCD21017")
 Trait_g1 = c("Heading_time","Plant_height")
-
-dat_g1 = droplevels(dat_F[dat_F$studyName %in% Trial_g1, ]) #subset trials with the above condition
+dim(dat_g1)
+dat_g1 = droplevels(dat_F[dat_F$studyName %in% Trial_g1, c("studyName", "germplasmName", "replicate",Trait_g1)]) #subset trials with the above condition
 BLUE_g1 = tibble() # To store the BLUE values
-
+summary(dat_g1)
 for(Trait in Trait_g1){
 suMean = dat_g1 %>% group_by(studyName, germplasmName) %>%
   summarise_at(.vars = Trait,.funs = mean, na.rm = T)
@@ -513,11 +558,12 @@ suMean = dat_g1 %>% group_by(studyName, germplasmName) %>%
   BLUE_g1 = rbind(BLUE_g1, suMean)
 }
 
+
 #2. Grain protein, Testweight, TKW
 Trial_g2 = c("UCD21011","UCD21016","UCD21017", "UCD22013","UCD22014","UCD22015","UCD22016","UCD22017","UCD22018","UCD22019" )
 Trait_g2 = c("Grain_Protein", "Test_weight", "TKW")
-dat_g2 = droplevels(dat_F[dat_F$studyName %in% Trial_g2, ])
-
+dat_g2 = droplevels(dat_F[dat_F$studyName %in% Trial_g2, c("studyName", "germplasmName", "replicate",Trait_g2)])
+summary(dat_g2)
 BLUE_g2 = tibble()
 
 for(Trait in Trait_g2){
@@ -532,31 +578,13 @@ suMean1 = dat_g2 %>% group_by(studyName, germplasmName) %>%
 comb_Mean_singleRep = rbind(BLUE_g1,BLUE_g2) # The combined single rep mean of the trials 
 comb_Mean_singleRep = as.data.frame(comb_Mean_singleRep)
 head(comb_Mean_singleRep)
-###############
-# Removing outlier 
-Trialcomb = c(c(Trial_g1, Trial_g2)[!c(Trial_g1, Trial_g2) %in% intersect(Trial_g1, Trial_g2)],intersect(Trial_g1, Trial_g2))
-Trait_woNa = c()
+BLUEMean_WO_SP
+BLUEMean_With_SP
+comb_Mean_singleRep
+comb_Mean_singleRep_wide = dcast(data = comb_Mean_singleRep, formula = Trial + germplasmName ~ Trait, 
+                                 fun.aggregate = mean, value.var = "BLUE_mean", na.rm = T)
+summary(comb_Mean_singleRep_wide)
 
-# Removing traits with NA value greater than 50%
-Traits22 = unique(comb_Mean_singleRep$Trait)
-BLUE_mean_SingleREp_Wo = tibble()
-for(Trial in Trialcomb){
-
-  df = comb_Mean_singleRep[comb_Mean_singleRep$Trial == Trial ,] 
-   for(Trait in unique(df$Trait)){
-     dft = df[df$Trait == Trait, ]
-    if(length(which(is.na(dft[,"BLUE_mean"]))) != length(dft[, "BLUE_mean"])){ # trials with whole NA values will be removed 
-    idot = which(dft[,"BLUE_mean"] %in% boxplot.stats(dft[,"BLUE_mean"])$out)
-    dft[idot,"BLUE_mean"] = NA
-    
-     
-    }
-    BLUE_mean_SingleREp_Wo = rbind(BLUE_mean_SingleREp_Wo,dft )
-   }}
-
-BLUEMean # mean for replicated trials 
-BLUE_mean_SingleREp_Wo # mean for single replicated triat
-BLUE_mean_SingleREp_Wo[BLUE_mean_SingleREp_Wo$Trial == "UCD20015", "Test_weight" ]
 ggplot(BLUE_mean_SingleREp_Wo, mapping = aes(x = Trial, y = BLUE_mean)) +
   geom_boxplot() + facet_wrap(~Trait, scales = "free") + theme(axis.text.x = element_text(angle = 90))
 ```
@@ -577,7 +605,7 @@ dat2rmean = dat2tr %>% group_by(studyName, germplasmName) %>%
 head(dat2rmean)
 Mean_Trial_SinRep_for_allTraits = as.data.frame(dat2rmean) # save it with new name 
 head(Mean_Trial_SinRep_for_allTraits)
-
+summary(Mean_Trial_SinRep_for_allTraits)
 # Removing the outlier using boxstatistics 
 for(Trial in c("UCD21014","UCD21015")){
 for(Trait in Traits){
@@ -603,6 +631,10 @@ for(i in colnames(Mean_Trial_SinRep_for_allTraits)[-c(1,2)] ){
   Mean_Trial_SinRep_for_allTraits_long = rbind(Mean_Trial_SinRep_for_allTraits_long, dt1)
 }
 
+Mean_Trial_SinRep_for_allTraits_long_wide = dcast(data = Mean_Trial_SinRep_for_allTraits_long, formula = studyName + germplasmName ~ Trait, fun.aggregate = mean, value.var = "Values", na.rm = T)
+summary(Mean_Trial_SinRep_for_allTraits_long_wide)
+head(Mean_Trial_SinRep_for_allTraits_long)
+colnames(Mean_Trial_SinRep_for_allTraits_long)[4] = "BLUE_mean"
 ggplot(Mean_Trial_SinRep_for_allTraits_long, mapping = aes(x = studyName,y = Values, fill = Trait)) + geom_boxplot() +
   facet_wrap(~Trait, scales = "free")
 
@@ -612,34 +644,32 @@ ggplot(Mean_Trial_SinRep_for_allTraits_long, mapping = aes(x = studyName,y = Val
 ##################################################
 # Combine Means of all groups of Trial together - as wide type 
 ###################################################
-BLUEMean_WO_SP # BLUE mean for trials without spatial 
-BLUEMean_With_SP # BLUE mean for trials with spatial
-BLUE_mean_SingleREp_Wo # Mean for trials with single rep in some traits
-Mean_Trial_SinRep_for_allTraits # Mean of single rep trials for all the traits 
+BLUEMean_WO_SP  # BLUE mean for trials without spatial
+head(BLUEMean_WO_SP_wide)
+head(BLUEMean_With_SP_wide)
+comb_Mean_singleRep_wide
+Mean_Trial_SinRep_for_allTraits_long_wide
 
 head(BLUEMean_WO_SP)
+BLUEMean_With_SP # BLUE mean for trials with spatial
 head(BLUEMean_With_SP)
-head(BLUE_mean_SingleREp_Wo)
-Mean_Comb_Trials1 = rbind(BLUEMean_WO_SP,BLUEMean_With_SP,BLUE_mean_SingleREp_Wo) # All the blue means combined 
-
+comb_Mean_singleRep # Mean for trials with single rep in some traits
+head(comb_Mean_singleRep)
+Mean_Trial_SinRep_for_allTraits_long # Mean of single rep trials for all the traits 
+head(Mean_Trial_SinRep_for_allTraits_long)
+colnames(Mean_Trial_SinRep_for_allTraits_long)[1] = "Trial"
+colnames(Mean_Trial_SinRep_for_allTraits_long)[4] = "BLUE_mean"
+Mean_Comb_All_Trials = rbind(BLUEMean_WO_SP,BLUEMean_With_SP,comb_Mean_singleRep, Mean_Trial_SinRep_for_allTraits_long) # All the blue means combined 
+summary(Mean_Comb_All_Trials)
 #Change the combined mean to wide type 
 library(reshape2)
-Mean_Comb_Trials1$BLUE_mean = as.numeric(Mean_Comb_Trials1$BLUE_mean)
+Mean_Comb_All_Trials$BLUE_mean = as.numeric(Mean_Comb_All_Trials$BLUE_mean)
 
-Mean_Comb_Trals1Wide = dcast(data = Mean_Comb_Trials1, formula = Trial + germplasmName ~ Trait, fun.aggregate = mean, value.var = "BLUE_mean", na.rm = T)
+Mean_Comb_TralsWide = dcast(data = Mean_Comb_All_Trials, formula = Trial + germplasmName ~ Trait, fun.aggregate = mean, value.var = "BLUE_mean", na.rm = T)
 
 colnames(Mean_Comb_Trals1Wide)[1] = "studyName"
-head(Mean_Comb_Trals1Wide)
-
-
-summary(Mean_Comb_Trals1Wide)
-################################################
-# Combine all mean data for BLUE estimation across trials - include teh SingleRep trial datas
-#################################################
-BLUE_Mean_Combined_All_Trails = rbind(Mean_Comb_Trals1Wide,Mean_Trial_SinRep_for_allTraits)
-
-head(BLUE_Mean_Combined_All_Trails) #This data is in wide type
-unique(BLUE_Mean_Combined_All_Trails$studyName)
+head(Mean_Comb_TralsWide)
+summary(Mean_Comb_TralsWide)
 
 ggplot(data = BLUE_Mean_Combined_All_Trails, mapping = aes(x = studyName, y = Test_weight, fill = studyName))+
   geom_boxplot() + theme_bw() + theme(axis.text.x  = element_text(angle = 90), legend.position = "none") 
@@ -650,13 +680,14 @@ ggplot(data = BLUE_Mean_Combined_All_Trails, mapping = aes(x = studyName, y = Te
 #####################################################
 # Estimating the BLUE mean of genotypes over trials
 ######################################################
-BLUE_Mean_Combined_All_Trails # Mean of the trials 
+Mean_Comb_TralsWide # Mean of the trials 
 
-str(BLUE_Mean_Combined_All_Trails)
-unique(BLUE_Mean_Combined_All_Trails$studyName)
-unique(BLUE_Mean_Combined_All_Trails$germplasmName)
+str(Mean_Comb_TralsWide)
+colnames(Mean_Comb_TralsWide)[1] = "studyName"
+unique(Mean_Comb_TralsWide$studyName)
+unique(Mean_Comb_TralsWide$germplasmName)
 
-summary(BLUE_Mean_Combined_All_Trails)
+summary(Mean_Comb_TralsWide)
 
 ####################################################
 # Removing outliers from BLUE mean of each trial
@@ -664,7 +695,7 @@ summary(BLUE_Mean_Combined_All_Trails)
 BLUE_Comb_mean_Wo_outlier = tibble()
 for(Trial in Trials){
 
-  df = BLUE_Mean_Combined_All_Trails[BLUE_Mean_Combined_All_Trails$studyName == Trial,]
+  df = Mean_Comb_TralsWide[Mean_Comb_TralsWide$studyName == Trial,]
   for (Trait in Traits) {
   id_out = which(df[,paste(Trait)] %in% boxplot.stats(df[,paste(Trait)])$out)
   if(length(id_out) > 0){
@@ -675,7 +706,7 @@ for(Trial in Trials){
   }
   BLUE_Comb_mean_Wo_outlier= rbind(BLUE_Comb_mean_Wo_outlier,df)
 }
-
+summary(BLUE_Comb_mean_Wo_outlier)
 ggplot(BLUE_Comb_mean_Wo_outlier, mapping = aes(x = studyName, y = Grain_Protein)) +
   geom_boxplot() + theme_bw() + theme(axis.text.x = element_text(angle = 90))
 
@@ -683,8 +714,8 @@ ggplot(BLUE_Comb_mean_Wo_outlier, mapping = aes(x = studyName, y = Grain_Protein
 #########################################################
 # Estimating the BLUE mean of the genotypes over trials
 ##########################################################
+library(LMMsolver)
 
-unique(BLUEMeanComAll_Trait$germplasmName)
 BLUE_Means_Over_Trials = tibble()
 for(Trait1 in Traits){
   
@@ -865,6 +896,8 @@ idf = which(dat_F$germplasmName %in% rownames(combGmat))
 dat_F = dat_F[idf, ]
 all(unique(dat_F$germplasmName) %in% rownames(combGmat))
 all(rownames(combGmat) %in% unique(dat_F$germplasmName))
+
+
 ```
 
 ```{r}
@@ -879,13 +912,14 @@ all(rownames(combGmat) %in% unique(dat_F$germplasmName))
 #4.The GBLUP fitted using the Final mean estimated 
 # The BlUE data across trials
 
-BLUE_Means_Over_Trials_wide # The TRUE mean values 
+summary(BLUE_Means_Over_Trials_wide) # The TRUE mean values 
 # The combined relationship matrix 
 combGmat = read.csv("CombGmat_UCDavis_prog.csv") # read the combinde relationship matrix 
 combGmat # combined relationship matrix 
 head(combGmat[, 1:10])
 rownames(combGmat) <- combGmat$X
 combGmat = combGmat[,-1]
+combGmat = as.matrix(combGmat)
 ##################
 # Select genotypes with marker data 
 idgno = which(BLUE_Means_Over_Trials_wide$germplasmName %in% rownames(combGmat)) 
@@ -903,7 +937,7 @@ is.matrix(combGmat_selected) # if this give false
 combGmat_selected = as.matrix(combGmat_selected)
 
 
-Pred_Accu = tibble() # store the accuracy
+Pred_Accu_two_stp = tibble() # store the accuracy
 for(Trait in Traits){
     
     # Creating a folder that contain 5 subset with 100 times with a total of 500
@@ -943,25 +977,70 @@ for(Trait in Traits){
      test.obs = test.obs[order(test.obs$germplasmName),]
      r = cor(test_pred[,Trait], test.obs[,Trait], use = "p")
      Accu = cbind(Trait = Trait, Accuracy = r)
-     Pred_Accu = rbind(Pred_Accu,Accu)
+     Pred_Accu_two_stp = rbind(Pred_Accu_two_stp,Accu)
     # data.frame(test.obs$germplasmName, test_pred$geno)
     }
 }
 
-Pred_Accu$Accuracy = as.numeric(Pred_Accu$Accuracy)
+Pred_Accu_two_stp$Accuracy = as.numeric(Pred_Accu_two_stp$Accuracy)
 
-ggplot(data = Pred_Accu, mapping = aes(x = Trait, y = Accuracy, fill = Trait)) +
+ggplot(data = Pred_Accu_two_stp, mapping = aes(x = Trait, y = Accuracy, fill = Trait)) +
   geom_boxplot() + theme_bw() + theme(axis.text.x = element_text(angle = 90))
 
-
-
-
-
-
-
-
-
 ```
+
+```{r}
+############################################
+#Estimating the GEBV with two step analysis 
+
+BLUE_Means_Accession_withMarker # BlUE data with marker data for genomic prediction 
+CombGmat = read.csv("CombGmat_UCDavis_prog.csv")
+rownames(CombGmat) <- CombGmat$X
+CombGmat = CombGmat[,-1]
+CombGmat <- as.matrix(CombGmat)
+idgen = BLUE_Means_Over_Trials_wide$germplasmName %in% rownames(CombGmat)
+BLUE_Means_Accession_withMarker = droplevels(BLUE_Means_Over_Trials_wide[idgen, ])
+dim(BLUE_Means_Accession_withMarker)
+
+GEBV_two_step = tibble()
+
+for(Trait in Traits){
+    
+      ######################## ###########
+# Analysis based on the four models 
+##########################################
+    eval(parse(text = paste("ans <- mmer(",Trait,"~1,
+                         random=~ vsr(germplasmName,Gu = CombGmat),
+                         rcov=~vsr(units),
+                         data= BLUE_Means_Accession_withMarker)")))
+  
+  
+  #Extract the GEBV
+   genoUef = as.matrix(ans$U$`u:germplasmName`[[Trait]])
+   genoUef= as.data.frame(genoUef)
+   genoUef$geno = rownames(genoUef)
+   intercept = ans$Beta[1,3]
+   genoUef$predict = genoUef$V1 + intercept
+   colnames(genoUef)[1] = "effects"
+   genoUef = genoUef[sort(genoUef$geno),]
+   GEBV = genoUef[,c(2,1,3)]
+   colnames(GEBV) <- c("germplasmName", "BLUP-effect", "GEBV_value") 
+   GEBV = cbind(Trait = Trait, GEBV)
+   rownames(GEBV) <- NULL
+   GEBV_two_step = rbind(GEBV_two_step,GEBV)
+    # data.frame(test.obs$germplasmName, test_pred$geno)
+    }
+
+GEBV_two_step$GEBV_value = as.numeric(GEBV_two_step$GEBV_value)
+head(GEBV_two_step)
+GEBV_two_step_wide = dcast(data = GEBV_two_step, formula = germplasmName ~ Trait, fun.aggregate = mean,
+                           value.var = "GEBV_value", na.rm = T)
+
+head(GEBV_two_step_wide)
+summary(GEBV_two_step_wide)
+```
+
+
 ```{r}
 ###################################
 # single step genomic prediction - Cross Validation II
@@ -1037,12 +1116,12 @@ eval(parse(text = paste("outl1 =  lmer(formula = ",Trait," ~ (1|germplasmName) +
     "LMM = LMMsolve(fixed = ",Trait," ~ germplasmName, random = ~ studyName + replicate:studyName + studyName:germplasmName, data = SL)")))
   
 Lmm_coef = coef(LMM) 
-PredMean = as.data.frame(Lmm_coef$germplasmName + Lmm_coef$`(Intercept)`) # Extract the predicted values
-colnames(PredMean)[1] = "Pred_mean"
-PredMean$germplasmName = gsub(pattern = "germplasmName_", replacement = "", x = rownames(PredMean))  
-head(PredMean)
-PredMean[,2]
-PredMean = PredMean[order(PredMean[,2]),]
+BLUE_mean = as.data.frame(Lmm_coef$germplasmName + Lmm_coef$`(Intercept)`) # Extract the predicted values
+colnames(BLUE_mean)[1] = "Pred_mean"
+BLUE_mean$germplasmName = gsub(pattern = "germplasmName_", replacement = "", x = rownames(BLUE_mean))  
+head(BLUE_mean)
+BLUE_mean[,2]
+BLUE_mean = BLUE_mean[order(BLUE_mean[,2]),]
 
 
 ################################
@@ -1057,7 +1136,7 @@ mrk1 = which(rownames(CombGmat) %in% SL1$germplasmName)
 CombGmat1 = CombGmat[mrk1,mrk1]
 
 # Creating a folder that contain 5 subset with 100 times with a total of 500
-  fold5 = caret::createMultiFolds(y = unique(SL1$germplasmName), k = 5, times = 2)
+  fold5 = caret::createMultiFolds(y = unique(SL1$germplasmName), k = 5, times = 3)
     
     
     for(i in 1:length(fold5)){
@@ -1099,7 +1178,7 @@ CombGmat1 = CombGmat[mrk1,mrk1]
    
    pred_test = pred_test[order(pred_test$geno), ]
    dim(pred_test)
-   obs_mean = PredMean[which(PredMean$germplasmName %in% unique(test.data$germplasmName)),]
+   obs_mean = BLUE_mean[which(BLUE_mean$germplasmName %in% unique(test.data$germplasmName)),]
    obs_mean = obs_mean[order(obs_mean$germplasmName),]
    pred_test1 = pred_test[pred_test$geno %in% obs_mean$germplasmName,]
    pred_test1 = pred_test1[order(pred_test1$geno),]
@@ -1132,27 +1211,22 @@ Accuracy_ST_Comb$Accuracy = as.numeric(Accuracy_ST_Comb$Accuracy)
 
 ggplot(data = Accuracy_ST_Comb, mapping = aes(x = Trait, y = Accuracy, fill = Trait)) +
   geom_boxplot() + theme_bw() + theme(axis.text.x = element_text(angle = 90))
-
-
-
-
-
-
 ```
 
 ```{r}
-###############################################################
-# Cross validation III
-# Two step GBLUP cross validation - BLUE mean estimated without spatial analysis in a single setp 
-#################################################################
-# 1. The TRUE mean value estimate - in a single step - without spatial analysis 
-# 2. This mean used in GBLUP
+###########################################
+# GEBV - for single step
+CombGmat = read.csv("CombGmat_UCDavis_prog.csv")
+rownames(CombGmat) <- CombGmat$X
+CombGmat = CombGmat[,-1]
+CombGmat = as.matrix(CombGmat)
 
-library(LMMsolver)
-BLUE_Mean_allTrials_wosp <- tibble()
+###############################
+# Estimating GEBV
+GEBV_singlestep = tibble()
 
+#Estimating the BLUE 
 for(Trait in Traits){
-#Detect outlier 
 eval(parse(text = paste("outl1 =  lmer(formula = ",Trait," ~ (1|germplasmName) + (1|studyName) + (1|replicate:studyName) + (1|germplasmName:studyName),
        data = dat_F)"))) 
 
@@ -1162,314 +1236,51 @@ eval(parse(text = paste("outl1 =  lmer(formula = ",Trait," ~ (1|germplasmName) +
   }else{
     SL = droplevels(dat_F[-idout,])
   }
- 
-  #Estimate the BlUE mean of the genotypes
-  eval(parse(text = paste(
-    "LMM = LMMsolve(fixed = ",Trait," ~ germplasmName, random = ~ studyName + replicate:studyName + studyName:germplasmName, data = SL)")))
-  
-Lmm_coef = coef(LMM) 
-PredMean = as.data.frame(Lmm_coef$germplasmName + Lmm_coef$`(Intercept)`) # Extract the predicted values
-colnames(PredMean)[1] = "Pred_mean"
-PredMean$germplasmName = gsub(pattern = "germplasmName_", replacement = "", x = rownames(PredMean))  
-head(PredMean)
-PredMean = PredMean[order(PredMean[,2]),]
-PredMean1 = cbind(Trait = Trait, PredMean)
-BLUE_Mean_allTrials_wosp = rbind(BLUE_Mean_allTrials_wosp,PredMean1)
+
+# Selecting genotypes with marker and phenotype data   
+idg1 = which(SL$germplasmName %in% rownames(CombGmat))
+SL1 = droplevels(SL[idg1,])
+mrk1 = which(rownames(CombGmat) %in% SL$germplasmName)
+CombGmat1 = CombGmat[mrk1,mrk1]
+dim(CombGmat1)
+
+
+     eval(parse(text = paste("ans <- mmer(",Trait,"~ 1,
+                                 random=~ studyName + replicate:studyName + studyName:germplasmName + 
+                                 vsr(germplasmName,Gu = CombGmat1),
+                                 rcov=~vsr(units),
+                                 data= SL1)")))
+
+   genoUef = as.matrix(ans$U$`u:germplasmName`[[Trait]])
+   genoUef= as.data.frame(genoUef)
+   genoUef$geno = rownames(genoUef)
+   intercept = ans$Beta[1,3]
+   genoUef$predict = genoUef$V1 + intercept
+   colnames(genoUef)[1] = "effects"
+   genoUef = genoUef[sort(genoUef$geno),]
+   GEBV = genoUef[,c(2,1,3)]
+   colnames(GEBV) <- c("germplasmName", "BLUP-effect", "GEBV_value") 
+   GEBV = cbind(Trait = Trait, GEBV)
+   rownames(GEBV) <- NULL
+   
+   GEBV_singlestep = rbind(GEBV_singlestep,GEBV )
 }
 
+head(GEBV_singlestep)
+str(GEBV_singlestep)
 
+GEBV_singlestep_wide = dcast(data = GEBV_singlestep, formula = germplasmName ~ Trait, fun.aggregate = mean, value.var = "GEBV_value", na.rm = T)
+head(GEBV_singlestep_wide)
+dim(GEBV_singlestep_wide)
+summary(GEBV_singlestep_wide)
+summary(GEBV_two_step_wide)
+#############################
+# Saving the GEBV values for the single and two step analysis
+library(openxlsx)
 
-##Fivefold cross validation 
-# BLUE mean wide type
-head(BLUE_Mean_allTrials_wosp)
-BLUE_Mean_allTrials_wosp_wide = dcast(data = BLUE_Mean_allTrials_wosp, formula = germplasmName ~ Trait, fun.aggregate = mean, value.var = "Pred_mean")
-str(BLUE_Mean_allTrials_wosp_wide)
-BLUE_Mean_allTrials_wosp_wide$germplasmName = as.factor(BLUE_Mean_allTrials_wosp_wide$germplasmName)
+out_GEBV = list(GEBV_Two_step = GEBV_two_step_wide, GEBV_Single_step = GEBV_singlestep_wide)
+write.xlsx(x = out_GEBV, file = "GEBV_Estimate_for_UCDavis_Nov_2023.xlsx", rowNames = F)
 
-#Selecting genotypes with genomic data 
-idgeno = which(unique(BLUE_Mean_allTrials_wosp_wide$germplasmName) %in% rownames(combGmat_selected))
-BLUE_Mean_allTrials_wosp_wide_sel = BLUE_Mean_allTrials_wosp_wide[idgeno, ] # Selected genotypes mean for cross validations
-dim(BLUE_Mean_allTrials_wosp_wide_sel)
-
-Pred_Accu1 = tibble() # store the accuracy
-
-for(Trait in Traits){
-    
-    # Creating a folder that contain 5 subset with 100 times with a total of 500
-    fold5 = caret::createMultiFolds(y = unique(BLUE_Mean_allTrials_wosp_wide_sel$germplasmName), k = 5, times = 10)
-    
-    
-    for(i in 1:length(fold5)){
-      index = fold5[[i]] # the index of the sample for training set
-      #subset the phenotypic data
-      train_geno = droplevels(unique(BLUE_Mean_allTrials_wosp_wide_sel$germplasmName)[index])
-      train_geno_ind = which(BLUE_Mean_allTrials_wosp_wide_sel$germplasmName %in% train_geno)
-      train.data <- droplevels(BLUE_Mean_allTrials_wosp_wide_sel %>%
-                                 filter(row_number() %in% train_geno_ind)) # subset the training set
-      dim(train.data)
-      test.data <- droplevels(BLUE_Mean_allTrials_wosp_wide_sel %>%
-                                filter(!row_number() %in% train_geno_ind)) # subset the testing set
-      dim(test.data)
-      test.obs = test.data
-      
-      test.data[,Traits] = NA # change the grain yield of the training set to NA value
-      
-      mod_dat = rbind(train.data, test.data) # combine the the data set for analysis
-      
-      ######################## ###########
-# Analysis based on the four models 
-##########################################
-    eval(parse(text = paste("ans <- mmer(",Trait,"~1,
-                         random=~ vsr(germplasmName,Gu = combGmat_selected),
-                         rcov=~vsr(units),
-                         data= train.data)")))
-     pred <-  as.data.frame(ans$U$`u:germplasmName`)
-     dim(pred)
-     pred$geno <- rownames(pred)
-     idpr = which(pred$geno %in% test.data$germplasmName)
-     test_pred = pred[idpr,]
-     test_pred = test_pred[order(test_pred$geno),]
-     test.obs = test.obs[order(test.obs$germplasmName),]
-     r = cor(test_pred[,Trait], test.obs[,Trait], use = "p")
-     Accu = cbind(Trait = Trait, Accuracy = r)
-     Pred_Accu1 = rbind(Pred_Accu1,Accu)
-    # data.frame(test.obs$germplasmName, test_pred$geno)
-    }
-}
-
-Pred_Accu1$Accuracy = as.numeric(Pred_Accu1$Accuracy)
-
-ggplot(data = Pred_Accu1, mapping = aes(x = Trait, y = Accuracy, fill = Trait)) +
-  geom_boxplot()
-
-
-
-
-
-```
-```{r}
-###############################################
-# Cross validation _IV
-#Two step analysis - the True BLUE mean estimated - from individual location mean
-##############################
-#1. The Blue mean of the replicated trials estimated 
-# 2. the values of the un-replicated trial organized 
-# 3. The the above two data merged for the TRUE mean value estimation 
-# 4. GBLUP done with the above TRUE mean value 
-
-Trials_WO_sp # list of trials without spatial information 
-data_Tr_WO_sp = droplevels(dat_F[dat_F$studyName %in% Trials_WO_sp, ])
-
-BLUEMean_1 = tibble() # trials without spatial
-for(Trial in Trials_WO_sp){
-  dt = droplevels(data_Tr_WO_sp[data_Tr_WO_sp$studyName == Trial,])
-  r = length(unique(dt$replicate))
-  Traits1 = c()
- for(Trait in Traits){
-
-
-  if(length(which(!is.na(dt[,Trait]))) > 0.5*length(dt$germplasmName)){
-    Traits1 = c(Traits1, Trait)
-  }
- }
-
-for(Trait1 in Traits1){
-  #remove outliers - the outlier removed using studentizedr value >3 
-      #removing outlier for replicated trials 
-      eval(parse(text = paste("outl1 <- lmer(",Trait1,"~(1|germplasmName) + (1|replicate),
-               data= dt)")))
-      
-      outlier = which(abs(stats::rstudent(outl1)) > 3)
-      if(length(outlier) == 0){
-        dt = dt}else{
-          
-          dt = dt[-outlier,]
-        }
-    
- 
-    eval(parse(text = paste( "av1 = mmer(fixed = ",Trait1," ~ germplasmName,
-           random = ~ replicate,
-           rcov = ~units, data = dt)")))
-
-
- pp = predict(object = av1, D = "germplasmName")
- m1 = pp$pvals
- 
- mean1 = cbind(Trial = Trial, Trait = Trait1, germplasmName = m1[,1], BLUE_mean = round(m1[,2],2))
- BLUEMean_1 = rbind(BLUEMean_1, mean1)
-  }
-}
-BLUEMean_1
-################################################
-# BLUE mean for trials with spatial information 
-#################################################
-Trial_spatial #Trial list with spatial analysis 
-
-data_Tr_With_Sp = droplevels(dat_F[dat_F$studyName %in% Trial_spatial,])
-BLUEMean_2 = tibble() # trials with spatial
-for(Trial in Trial_spatial){
-  dt = droplevels(data_Tr_With_Sp[data_Tr_With_Sp$studyName == Trial,])
-  r = length(unique(dt$replicate))
-  Traits1 = c()
- for(Trait in Traits){
-
-
-  if(length(which(!is.na(dt[,Trait]))) > 0.5*length(dt$germplasmName)){
-    Traits1 = c(Traits1, Trait)
-  }
- }
-
-for(Trait1 in Traits1){
-  #remove outliers - the outlier removed using studentizedr value >3 
-      #removing outlier for replicated trials 
-      eval(parse(text = paste("outl1 <- lmer(",Trait1,"~(1|germplasmName) + (1|replicate),
-               data= dt)")))
-      
-      outlier = which(abs(stats::rstudent(outl1)) > 3)
-      if(length(outlier) == 0){
-        dt = dt}else{
-          
-          dt = dt[-outlier,]
-        }
-    
-
- ##Predicting the BLUE values
-
-  eval(parse(text = paste( "av1 = mmer(fixed = ",Trait1," ~ germplasmName,
-           random = ~ replicate,
-           rcov = ~units, data = dt)")))
-
-
- pp = predict(object = av1, D = "germplasmName")
- m1 = pp$pvals
- 
- mean1 = cbind(Trial = Trial, Trait = Trait1, germplasmName = m1[,1], BLUE_mean = round(m1[,2],2))
- BLUEMean_2 = rbind(BLUEMean_2, mean1)
-
-  }
-}
-
-
-BLUEMean_2
-BLUEMean_1
-summary(as.numeric(BLUEMean_1$BLUE_mean))
-BLUE_mean_SingleREp_Wo # mean for single replicated trait
-Mean_Trial_SinRep_for_allTraits # mean for single rep trials 
-
-
-#Combine the two means - BLUE means of the replicated and single replicated traits
-BLUEMean_Comb_grp1 = rbind(BLUEMean_1,BLUEMean_2, BLUE_mean_SingleREp_Wo)
-str(BLUEMean_Comb_grp1)
-BLUEMean_Comb_grp1$BLUE_mean = as.numeric(BLUEMean_Comb_grp1$BLUE_mean)
-
-#Change the above mean to wide type
-BLUEMean_Comb_grp1_wide = dcast(data = BLUEMean_Comb_grp1,formula = Trial + germplasmName ~ Trait , fun.aggregate = mean, value.var = "BLUE_mean")
-head(BLUEMean_Comb_grp1_wide)
-colnames(BLUEMean_Comb_grp1_wide)[1] = "studyName"
-head(Mean_Trial_SinRep_for_allTraits)
-colnames(BLUEMean_Comb_grp1_wide)
-colnames(Mean_Trial_SinRep_for_allTraits)
-BLUEMean_Comb_All_wide_Wo_Sp = rbind(BLUEMean_Comb_grp1_wide,Mean_Trial_SinRep_for_allTraits) # combine all datas for further analysis
-
-####################
-# Estimate the BLUE mean of the genotypes across trials 
-str(BLUEMean_Comb_All_wide_Wo_Sp)
-BLUEMean_Comb_All_wide_Wo_Sp$studyName = as.factor(BLUEMean_Comb_All_wide_Wo_Sp$studyName)
-BLUEMean_Comb_All_wide_Wo_Sp$germplasmName = as.factor(BLUEMean_Comb_All_wide_Wo_Sp$germplasmName)
-BLUE_Mean_All_trials_Wosp_comb <- tibble()
-library(spam64)
-for(Trait in Traits){
-#Detect outlier 
-eval(parse(text = paste("outl1 =  lmer(formula = ",Trait," ~ (1|germplasmName) + (1|studyName),
-       data = BLUEMean_Comb_All_wide_Wo_Sp)"))) 
-
-  idout = which(abs(stats::rstudent(outl1)) >3)
-  if(length(idout) == 0){
-    SL = droplevels(BLUEMean_Comb_All_wide_Wo_Sp)
-  }else{
-    SL = droplevels(BLUEMean_Comb_All_wide_Wo_Sp[-idout,])
-  }
- 
-  #Estimate the BlUE mean of the genotypes
-  eval(parse(text = paste(
-    "LMM = LMMsolve(fixed = ",Trait," ~ germplasmName, random = ~ studyName, data = SL)")))
-  
-Lmm_coef = coef(LMM) 
-PredMean = as.data.frame(Lmm_coef$germplasmName + Lmm_coef$`(Intercept)`) # Extract the predicted values
-colnames(PredMean)[1] = "Pred_mean"
-PredMean$germplasmName = gsub(pattern = "germplasmName_", replacement = "", x = rownames(PredMean))  
-head(PredMean)
-PredMean = PredMean[order(PredMean[,2]),]
-PredMean1 = cbind(Trait = Trait, PredMean)
-BLUE_Mean_All_trials_Wosp_comb = rbind(BLUE_Mean_All_trials_Wosp_comb,PredMean1)
-}
-head(BLUE_Mean_All_trials_Wosp_comb)
-
-##Fivefold cross validation 
-# BLUE mean wide type
-head(BLUE_Mean_All_trials_Wosp_comb)
-BLUE_Mean_All_trials_Wosp_comb_wide = dcast(data = BLUE_Mean_All_trials_Wosp_comb, formula = germplasmName ~ Trait, fun.aggregate = mean, value.var = "Pred_mean")
-str(BLUE_Mean_All_trials_Wosp_comb_wide)
-BLUE_Mean_All_trials_Wosp_comb_wide$germplasmName = as.factor(BLUE_Mean_All_trials_Wosp_comb_wide$germplasmName)
-
-#Selecting genotypes with genomic data 
-idgeno = which(unique(BLUE_Mean_All_trials_Wosp_comb_wide$germplasmName) %in% rownames(combGmat_selected))
-BLUE_Mean_All_trials_Wosp_comb_wide_sel = BLUE_Mean_All_trials_Wosp_comb_wide[idgeno, ] # Selected genotypes mean for cross validations
-dim(BLUE_Mean_All_trials_Wosp_comb_wide_sel)
-
-for(Trait in Traits){
-idout = which(BLUE_Mean_All_trials_Wosp_comb_wide_sel[,Trait] %in% boxplot.stats(BLUE_Mean_All_trials_Wosp_comb_wide_sel[,Trait])$out)
-BLUE_Mean_All_trials_Wosp_comb_wide_sel[idout,]
-}
-Pred_Accu_two_step_Wo_sp = tibble() # store the accuracy
-
-for(Trait in Traits){
-    
-    # Creating a folder that contain 5 subset with 100 times with a total of 500
-    fold5 = caret::createMultiFolds(y = unique(BLUE_Mean_All_trials_Wosp_comb_wide_sel$germplasmName), k = 5, times = 5)
-    
-    
-    for(i in 1:length(fold5)){
-      index = fold5[[i]] # the index of the sample for training set
-      #subset the phenotypic data
-      train_geno = droplevels(unique(BLUE_Mean_All_trials_Wosp_comb_wide_sel$germplasmName)[index])
-      train_geno_ind = which(BLUE_Mean_All_trials_Wosp_comb_wide_sel$germplasmName %in% train_geno)
-      train.data <- droplevels(BLUE_Mean_All_trials_Wosp_comb_wide_sel %>%
-                                 filter(row_number() %in% train_geno_ind)) # subset the training set
-      dim(train.data)
-      test.data <- droplevels(BLUE_Mean_All_trials_Wosp_comb_wide_sel %>%
-                                filter(!row_number() %in% train_geno_ind)) # subset the testing set
-      dim(test.data)
-      test.obs = test.data
-      
-      test.data[,Traits] = NA # change the grain yield of the training set to NA value
-      
-      mod_dat = rbind(train.data, test.data) # combine the the data set for analysis
-      
-      ######################## ###########
-# Analysis based on the four models 
-##########################################
-    eval(parse(text = paste("ans <- mmer(",Trait,"~1,
-                         random=~ vsr(germplasmName,Gu = combGmat_selected),
-                         rcov=~vsr(units),
-                         data= train.data)")))
-     pred <-  as.data.frame(ans$U$`u:germplasmName`)
-     dim(pred)
-     pred$geno <- rownames(pred)
-     idpr = which(pred$geno %in% test.data$germplasmName)
-     test_pred = pred[idpr,]
-     test_pred = test_pred[order(test_pred$geno),]
-     test.obs = test.obs[order(test.obs$germplasmName),]
-     r = cor(test_pred[,Trait], test.obs[,Trait], use = "p")
-     Accu = cbind(Trait = Trait, Accuracy = r)
-     Pred_Accu_two_step_Wo_sp = rbind(Pred_Accu_two_step_Wo_sp,Accu)
-    # data.frame(test.obs$germplasmName, test_pred$geno)
-    }
-}
-Pred_Accu_two_step_Wo_sp$Accuracy = as.numeric(Pred_Accu_two_step_Wo_sp$Accuracy)
-
-ggplot(data = Pred_Accu_two_step_Wo_sp, mapping = aes(x = Trait, y = Accuracy, fill = Trait)) +
-  geom_boxplot()
 
 
 
