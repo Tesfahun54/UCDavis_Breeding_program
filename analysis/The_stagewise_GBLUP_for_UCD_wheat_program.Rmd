@@ -135,7 +135,7 @@ GBS_snps_t1 <- GBS_snps_t # removing the markers with NA values > 20%
 
 # filter based on MAF 
 GBS_snps_t1_MAF <- maf_filter(M = GBS_snps_t1, thresh = 0.05)
-dim(GBS_snps_t1_MAF)
+dim(GBS_snps_t1_MAF) # dimension 
 
 #####
 # Estimate the GRM - for the Allegro genotyping protocol
