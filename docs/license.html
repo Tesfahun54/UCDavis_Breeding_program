@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>License</title>
+
+<script src="site_libs/header-attrs-2.25/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">GP_Wheat_UCDavis</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">License</h1>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2024-02-13
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 2
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>GP_Wheat_UCDavis/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.1). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefsshgithubcomTesfahun54spatialanalysisupdatedtree81e9ae6771990cdc0c57cf142400ca2926575e87targetblank81e9ae6a">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="ssh://github.com:Tesfahun54/spatial_analysis_updated/tree/81e9ae6771990cdc0c57cf142400ca2926575e87" target="_blank">81e9ae6</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefsshgithubcomTesfahun54spatialanalysisupdatedtree81e9ae6771990cdc0c57cf142400ca2926575e87targetblank81e9ae6a"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="ssh://github.com:Tesfahun54/spatial_analysis_updated/tree/81e9ae6771990cdc0c57cf142400ca2926575e87" target="_blank">81e9ae6</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    Genomic_selection_wheat/.DS_Store
+    Ignored:    Genomic_selection_wheat/Genomic_prediction_services/.DS_Store
+    Ignored:    Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/.DS_Store
+    Ignored:    Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/.RData
+    Ignored:    Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/.Rhistory
+    Ignored:    Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/GP_Wheat_UCDavis/.DS_Store
+    Ignored:    Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/GP_Wheat_UCDavis/.RData
+    Ignored:    Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/GP_Wheat_UCDavis/.Rhistory
+    Ignored:    spatial_analysis/.DS_Store
+    Ignored:    spatial_analysis/.Rhistory
+    Ignored:    spatial_analysis/.Rproj.user/
+    Ignored:    spatial_analysis/Spatial_analysis.Rproj
+    Ignored:    spatial_analysis/analysis/.DS_Store
+    Ignored:    spatial_analysis/analysis/.RData
+    Ignored:    spatial_analysis/analysis/.Rhistory
+    Ignored:    test/
+
+Untracked files:
+    Untracked:  .DS_Store
+    Untracked:  .gitignore
+    Untracked:  1-s2.0-S0022030208709901-main (1).pdf
+    Untracked:  1-s2.0-S0022030208709901-main.pdf
+    Untracked:  1-s2.0-S2214514116000179-main.pdf
+    Untracked:  135490-Article Text-363229-1-10-20160511.pdf
+    Untracked:  1607.08255.pdf
+    Untracked:  2019_Nettleton_AdjustingSpatialPreprint.pdf
+    Untracked:  2105 (1).pdf
+    Untracked:  2105.pdf
+    Untracked:  2533991.pdf
+    Untracked:  73230.pdf
+    Untracked:  978-3-319-55177-7.pdf
+    Untracked:  Accountinf for natural and extraneous variation in the analysis of field experiemnts.pdf
+    Untracked:  Adjusting for Spatial Effects in Genomic Prediction.pdf
+    Untracked:  An Expectation-Maximization Algorithm for Combining a Sample of Partially Overlapping Covariance Matrices.pdf
+    Untracked:  Analysis of Field Experiments by Least Squares Smoothing..pdf
+    Untracked:  Assignment with Jean-luc april 25, 2023.docx
+    Untracked:  BrApi/
+    Untracked:  Crash_course_handout.pdf
+    Untracked:  Crop Science - 2019 - Damesa - Comparison of Weighted and Unweighted Stage‐Wise Analysis for Genome‐Wide Association.pdf
+    Untracked:  Crop Science - 2023 - Raffo - Gene   gene and genotype   environment interactions in wheat.pdf
+    Untracked:  Database analysis/
+    Untracked:  Efficient two-dimensional smoothing with  -spline ANOVA mixed models and nested bases.pdf
+    Untracked:  Elias_et_al_2017_spatial.zip
+    Untracked:  Elias_et_al_2017_spatial/
+    Untracked:  Ethiopian barley diversity analysis.docx
+    Untracked:  European J Soil Science - 2020 - Slaets - Linear mixed models and geostatistics for designed experiments in soil science .pdf
+    Untracked:  Fast smoothing parameter separation in multidimensional.pdf
+    Untracked:  First_draft_spatial_analysis_aricle.docx
+    Untracked:  Flexible smoothing with P-splines- a uni ed approach.pdf
+    Untracked:  Genomic Prediction Can Provide Precise Estimates of the Genotypic Value of Barley Lines Evaluated in Unreplicated Trials.pdf
+    Untracked:  Genomic_Prediction_Can_Provide_Precise_Estimates_o.pdf
+    Untracked:  Genomic_selection_wheat/1-s2.0-B9780123855312000025-main.pdf
+    Untracked:  Genomic_selection_wheat/1-s2.0-S1360138514001411-main.pdf
+    Untracked:  Genomic_selection_wheat/1-s2.0-S136013851730184X-main.pdf
+    Untracked:  Genomic_selection_wheat/1-s2.0-S2211675317301070-main.pdf
+    Untracked:  Genomic_selection_wheat/1-s2.0-S221451411830062X-main.pdf
+    Untracked:  Genomic_selection_wheat/10.1515_sg-2011-0004.pdf
+    Untracked:  Genomic_selection_wheat/10835412.pdf
+    Untracked:  Genomic_selection_wheat/12trials_Marker-data/
+    Untracked:  Genomic_selection_wheat/50Trial_data/
+    Untracked:  Genomic_selection_wheat/978-1-4939-0446-4.pdf
+    Untracked:  Genomic_selection_wheat/978-4-431-55675-6.pdf
+    Untracked:  Genomic_selection_wheat/Biometrical J - 2022 - Piepho - Two‐dimensional P‐spline smoothing for spatial analysis of plant breeding trials.pdf
+    Untracked:  Genomic_selection_wheat/Crop Science - 2012 - Heslot - Genomic Selection in Plant Breeding  A Comparison of Models.pdf
+    Untracked:  Genomic_selection_wheat/Cross_validation_plots_June15_final.pptx
+    Untracked:  Genomic_selection_wheat/Cross_validation_plots_June9.pptx
+    Untracked:  Genomic_selection_wheat/Cullis-SpatialAnalysisMultiEnvironment-1998.pdf
+    Untracked:  Genomic_selection_wheat/Doc1.docx
+    Untracked:  Genomic_selection_wheat/FAOSTAT_data_en_5-26-2023.csv
+    Untracked:  Genomic_selection_wheat/First_draft_spatial_analysis_aricle.docx
+    Untracked:  Genomic_selection_wheat/Fully_efficient_two-stage_analysis_of_multi-enviro.pdf
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/ Mohammadi Popvar.pdf
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/1-s2.0-S221451411830062X-main.pdf
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/1503.pdf
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/3727.pdf
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/41598_2020_Article_68343.pdf
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/4b62e58f9ac8626a53f5da27ea304df597aa.pdf
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/58977.pdf
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/Accelarated plant breeding vl 1 creal crops.pdf
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/Accelarated plant breeding.pdf
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/Agronomy Journal - 2017 - Damesa - One Step at a Time  Stage‐Wise Analysis of a Series of Experiments.pdf
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/F3b_Y4-aQAAk_uJ.jpeg
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/Genomic prediction of complex traits.pdf
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/Kang etal 2008.pdf
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/Plant Breeding - 2022 - Michel.pdf
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/The Plant Genome - 2011 - Endelman.pdf
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/The Plant Genome - 2016 - Battenfield.pdf
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/The Plant Genome - 2017 - Lado.pdf
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/The Plant Genome - 2023 - Brzozowski.pdf
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/Tibshirani (JRSS-B 1996).pdf
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/Training set optimization of genomic prediction by means of EthAcc.pdf
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Book1.xlsx
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/CombGmat_UCDavis_prog.csv
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/GBLUP_alternative_prediction_methods.Rmd
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/GBLUP_prediction_for_UCDVIS_All_Traits.csv
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/GEBV_EStimated_twostage_UCDAVis.csv
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/GEBV_EStimated_twostage_only_replicated_cov_str_incl_comb_UCDAVis.csv
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/GEBV_EStimated_twostage_unrep_comb_UCDAVis.csv
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/GEBV_EStimated_twostage_unrep_indloc_cov_incl_comb_UCDAVis.csv
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/GEBV_Estimate_for_UCDavis_Nov_2023.xlsx
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/GP_Wheat_UCDavis/analysis/The_stagewise_GBLUP_for_UCD_wheat_program.Rmd
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/GP_Wheat_UCDavis/data/SNPs_UCDavis_2020_Allegro_protocol_dosage.tsv
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/GP_Wheat_UCDavis/data/SNPs_UCDavis_UCD_2022GBS_V2__protocol_dosage.tsv
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/GP_Wheat_UCDavis/data/phenotype_UCDavis_Bread_Wheat_Breeding_2020_2022_trials.csv
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/GRM_comb_UCD_add.csv
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Grain_Protein_UCD20010_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Grain_Protein_UCD20013_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Grain_Protein_UCD20014_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Grain_Protein_UCD20015_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Grain_Protein_UCD20016_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Grain_Protein_UCD20017_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Grain_Protein_UCD21010_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Grain_Protein_UCD21013_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Grain_Protein_UCD22010_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Grain_Protein_boxplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Grain_Yield_UCD20010_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Grain_Yield_UCD20013_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Grain_Yield_UCD20014_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Grain_Yield_UCD20015_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Grain_Yield_UCD20016_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Grain_Yield_UCD20017_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Grain_Yield_UCD21010_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Grain_Yield_UCD21011_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Grain_Yield_UCD21013_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Grain_Yield_UCD21016_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Grain_Yield_UCD21017_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Grain_Yield_UCD22010_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Grain_Yield_UCD22013_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Grain_Yield_UCD22014_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Grain_Yield_UCD22015_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Grain_Yield_UCD22016_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Grain_Yield_UCD22017_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Grain_Yield_UCD22018_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Grain_Yield_UCD22019_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Grain_Yield_boxplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Heading_time_UCD22010_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Heading_time_UCD22013_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Heading_time_UCD22014_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Heading_time_UCD22015_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Heading_time_UCD22016_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Heading_time_UCD22017_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Heading_time_UCD22018_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Heading_time_UCD22019_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Heading_time_boxplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Heritability_for19Trials.csv
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Heritability_for19Trials_30PNA.csv
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Heritability_for19Trials_50PNA.csv
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Materials and Methods for Genomic prediction ser.docx
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/PhenDat_UCD_with_Rep_with_sp.csv
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/PhenDat_UCD_with_Rep_wo_sp.csv
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/PhenUCDAvis_Yieldrep.csv
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/PhenUCDAvis_test_3stagewise.csv
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/PhenUCDAvis_test_stagewise.csv
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/PhenUCD_Trial_with_Rep.csv
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/PhenUCD_Trial_without_Rep.csv
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Plant_height_UCD22010_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Plant_height_UCD22013_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Plant_height_UCD22014_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Plant_height_UCD22015_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Plant_height_UCD22016_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Plant_height_UCD22017_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Plant_height_UCD22018_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Plant_height_UCD22019_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Plant_height_boxplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Predicted_GEBVs_two_stagewith_sommer.xlsx
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Presentation_GPred_UCDavis.pptx
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Presentation_forUCDAVIS_NOV2.pptx
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Pseudo code for Wheat genomic prediction.docx
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/SNPs_UCDavis_2020_Allegro_protocol.vcf
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/SNPs_UCDavis_2020_Allegro_protocol_dosage.tsv
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/SNPs_UCDavis_UCD_2022GBS_V2__protocol.vcf
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/SNPs_UCDavis_UCD_2022GBS_V2__protocol_dosage.tsv
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Single_Trait_genomicSelection_BLUE_withhetrogeneous_var.R
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Stage1_ex.csv
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Summary_Result_GXE_Fababean.xlsx
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/TKW_UCD20010_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/TKW_UCD20013_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/TKW_UCD20014_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/TKW_UCD20015_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/TKW_UCD20016_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/TKW_UCD20017_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/TKW_UCD21010_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/TKW_UCD21013_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/TKW_UCD22010_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/TKW_boxplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Test_weight_UCD20010_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Test_weight_UCD20013_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Test_weight_UCD20014_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Test_weight_UCD20015_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Test_weight_UCD20016_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Test_weight_UCD20017_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Test_weight_UCD21010_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Test_weight_UCD21013_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Test_weight_UCD22010_qqplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Test_weight_boxplot.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/The_stagewise_GBLUP_for_UCD_wheat_program.Rmd
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/The_summary_Marker_NA_Trait_availability.xlsx
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/The_summary_of_Genotype_phenotype_data_inforamtion_UCdavis_breeding_program.xlsx
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/The_summary_of_Genotype_phenotype_data_inforamtion_UCdavis_breeding_program_updated.xlsx
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Three stage_genomicPrediction_usingSommer.R
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Trial_vs_traits_summary_UCDAVIs_BreedingProg.csv
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Two_stage_genomic_prediction_UCDavis.Rmd
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/Two_three_stage_Genomicprediction_Davis.R
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/UCD_pedigrees_genotypes-withoutmarker.csv
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/linear mixed effects models using R.pdf
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/phenotype_UCDavis_Bread_Wheat_Breeding_2020_2022_trials.csv
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/single_Trait_Genomic_Prediction_Final.Rmd
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/single_step_Genomic_selection_onlyUCDavis.Rmd
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/test.png
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/v4.sommer.gxe.pdf
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/~$The_summary_of_Genotype_phenotype_data_inforamtion_UCdavis_breeding_program_updated.xlsx
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/agriculture-11-00932-v5.pdf
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/combining_different_genotyping_platform/
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/cross prediction mathias.pdf
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/cross_prediction/
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/file.pdf
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/fpls-09-01899.pdf
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/fpls-12-651480.pdf
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/fpls-12-658267.pdf
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/fpls-12-685488.pdf
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/fpls-12-715910.pdf
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/fpls-14-1131493.pdf
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/fpls-14-1171135.pdf
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/iyab122.pdf
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/jkaa050.pdf
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/jkab440.pdf
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/marker envt genotype interaction /
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/marker-assisted-selection-using-ridge-regression.pdf
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/pone_0172082_pdf_imputation.pdf
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/s00122-018-3125-3.pdf
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/s00122-023-04254-9.pdf
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/s12711-015-0116-6.pdf
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/s41598-018-38081-6.pdf
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/s42003-022-03738-6imputation.pdf
+    Untracked:  Genomic_selection_wheat/Genomic_prediction_services/svd-notes.pdf
+    Untracked:  Genomic_selection_wheat/Haplotypblocking/
+    Untracked:  Genomic_selection_wheat/Haplotype_GWAS/
+    Untracked:  Genomic_selection_wheat/Improving_Genomic_Prediction_in_Cassava_Field_Expe.pdf
+    Untracked:  Genomic_selection_wheat/J Agronomy Crop Science - 2012 - Leiser - Getting the Most Out of Sorghum Low‐Input Field Trials in West Africa Using.pdf
+    Untracked:  Genomic_selection_wheat/KirigwiBrown-GuediraMarkersQTL MolBreeding07.pdf
+    Untracked:  Genomic_selection_wheat/Materials and methods_June22_2023.docx
+    Untracked:  Genomic_selection_wheat/Materials and methods_June9_2023.docx
+    Untracked:  Genomic_selection_wheat/MegaLMM FactoranLysis .pptx
+    Untracked:  Genomic_selection_wheat/Pedigree_information/
+    Untracked:  Genomic_selection_wheat/Prelminary_result_spatial_analysis_June22.pptx
+    Untracked:  Genomic_selection_wheat/Presentation1.pptx
+    Untracked:  Genomic_selection_wheat/Presentation_MegaLMM_sept_22_2023.pptx
+    Untracked:  Genomic_selection_wheat/Rscripts_for-spatial/
+    Untracked:  Genomic_selection_wheat/Small Grains Breeding Project Plot Sizes.docx
+    Untracked:  Genomic_selection_wheat/Steps carried out for the Spatial Analysis project.pdf
+    Untracked:  Genomic_selection_wheat/Summary_experiments_with-genom_WheatCap(AutoRecovered).xlsx
+    Untracked:  Genomic_selection_wheat/The Plant Genome - 2019 - Berro - Training Population Optimization for Genomic Selection.pdf
+    Untracked:  Genomic_selection_wheat/The combined major analysis steps of spatial analysis.docx
+    Untracked:  Genomic_selection_wheat/The major analysis steps in the spatial analysis.docx
+    Untracked:  Genomic_selection_wheat/The wheat genom book.pdf
+    Untracked:  Genomic_selection_wheat/WheatD_genome_originfull.pdf
+    Untracked:  Genomic_selection_wheat/agronomy-12-00714-v2.pdf
+    Untracked:  Genomic_selection_wheat/asreml_4.2.0.302.tgz
+    Untracked:  Genomic_selection_wheat/asreml_4.2.0.302am.tgz
+    Untracked:  Genomic_selection_wheat/elq001.pdf
+    Untracked:  Genomic_selection_wheat/fpls-12-718611.pdf
+    Untracked:  Genomic_selection_wheat/fpls-14-1168547.pdf
+    Untracked:  Genomic_selection_wheat/genetics1819.pdf
+    Untracked:  Genomic_selection_wheat/gurrin2005.pdf
+    Untracked:  Genomic_selection_wheat/in wheat JL lab presnetation sept 22_2023.pptx
+    Untracked:  Genomic_selection_wheat/nature anotation abstract.jpeg
+    Untracked:  Genomic_selection_wheat/s00122-011-1732-3.pdf
+    Untracked:  Genomic_selection_wheat/s11032-007-9100-3.pdf
+    Untracked:  Genomic_selection_wheat/s12711-020-00588-w.pdf
+    Untracked:  Genomic_selection_wheat/s12864-020-07319-x.pdf
+    Untracked:  Genomic_selection_wheat/s41437-022-00508-2.pdf
+    Untracked:  Genomic_selection_wheat/sample_genomicselection_scripts/
+    Untracked:  Genomic_selection_wheat/spatialanaysis_final/
+    Untracked:  Genomic_selection_wheat/summary_res_predictability_all_trials.xlsx
+    Untracked:  Genomic_selection_wheat/taye2008.pdf
+    Untracked:  Genomic_selection_wheat/unreplicatedtrial kemptron.pdf
+    Untracked:  Genomic_selection_wheat/v63i19.pdf
+    Untracked:  Genomic_selection_wheat/~$Prelminary_result_spatial_analysis_June22.pptx
+    Untracked:  How to impute the SNPs data using Beagle software.docx
+    Untracked:  How to use the server  Biohpc.docx
+    Untracked:  Individual-model-ANOVA-on-correlation-R-cross-validation-replicates.png
+    Untracked:  Materials and methods spatial analysis .docx
+    Untracked:  Materials and methods spatial analysis final.docx
+    Untracked:  MegaLMM genomic prediction.pdf
+    Untracked:  Modelling spatial trends in sorghum breeding field trials using a two-dimensional P-spline mixed model.pdf
+    Untracked:  Modelling_spatial_trends_in_sorghum_breeding_field.pdf
+    Untracked:  Money et al. LD KINN imputation method.pdf
+    Untracked:  NSF Award Search_ Award # 2222434 - URoL_EN_ Convergence of biology and architecture_ how emergent system dynamics generate adaptable, robust, and resilient forms.pdf
+    Untracked:  Nearest Neighbour (NN) Analysis of Field Experiments.pdf
+    Untracked:  PHG_haplotype graph/
+    Untracked:  PSEUDOREPLICATION AND THE DESIGN OF ECOLOGICAL FIELD EXPERIMENTS'.pdf
+    Untracked:  QTLusing sommer.pdf
+    Untracked:  RogerCropscience06.pdf
+    Untracked:  Rscripts for spatial analysis/
+    Untracked:  Slides-Martin-Boer.pdf
+    Untracked:  Statistical-models-of-single-replicate-experiments-For-representative-experiments.png
+    Untracked:  The observations on the data .docx
+    Untracked:  Wheat.docx
+    Untracked:  accuracy measurement .docx
+    Untracked:  applied-statistics-mk-002-en.pdf
+    Untracked:  b97636.pdf
+    Untracked:  braun2011.pdf
+    Untracked:  combining multiomic data.pdf
+    Untracked:  cross validation/
+    Untracked:  data_geno_pheno/
+    Untracked:  fgene-12-680569.pdf
+    Untracked:  fieldtrialanalysis.Rmd
+    Untracked:  file.pdf
+    Untracked:  fpls-12-734512.pdf
+    Untracked:  g3journal0481.pdf
+    Untracked:  get_blups.R
+    Untracked:  git-github-reference.pdf
+    Untracked:  githubtoken.docx
+    Untracked:  mvngGrAd.pdf
+    Untracked:  ncreased Genomic Prediction Accuracy in Wheat Breeding Through Spatial Adjustment of Field Trial Data.pdf
+    Untracked:  piepho2003.pdf
+    Untracked:  pone.0007454.pdf
+    Untracked:  pone.0007522.pdf
+    Untracked:  populaiton structure and genomic selction/
+    Untracked:  s10681-007-9622-0.pdf
+    Untracked:  script_sta121.pdf
+    Untracked:  spatial analysis angela.pdf
+    Untracked:  spatial analysis of mulit-environment early generation tirals .pdf
+    Untracked:  spatial_analysis/1-s2.0-S2211675317301070-main.pdf
+    Untracked:  spatial_analysis/Cross validation for the trials - with marker data.R
+    Untracked:  spatial_analysis/Cross_Validation_for-trials_with_marker_but_no_spatial_analysis_no_predict_funciton.R
+    Untracked:  spatial_analysis/Cross_validation_to_loop_over_factors_sommer.R
+    Untracked:  spatial_analysis/Cross_validation_without_spatial_without_marker_sommer_no_predict_fun.R
+    Untracked:  spatial_analysis/First_draft_spatial_analysis_aricle.docx
+    Untracked:  spatial_analysis/Genomic_prediction_with_sommer/
+    Untracked:  spatial_analysis/MegaLMM analysis for multienvironemtn trials.Rmd
+    Untracked:  spatial_analysis/Notes on spatial analysis.docx
+    Untracked:  spatial_analysis/analysis/Cross_validation_with_without_marker_sommer.R
+    Untracked:  spatial_analysis/analysis/SingleLoc_analysis_with_marker_normal and spatial.Rmd
+    Untracked:  spatial_analysis/analysis/Sommer_with_Snp_data.R
+    Untracked:  spatial_analysis/christina/
+    Untracked:  spatial_analysis/code/Genotype_and_phenotype_data_preparation for anlysis.R
+    Untracked:  spatial_analysis/data/wheat_trials_with_layouts_reps.csv
+    Untracked:  spatial_analysis/graphwith_r.R
+    Untracked:  spatial_analysis/spatial_analysis_updated/
+    Untracked:  statistical_modeling_of_phenotypic_pedigree_and_g-wageningen_university_and_research_511730.pdf
+    Untracked:  v1.sommer.quick.start.pdf
+    Untracked:  v6.sommer.spatial.pdf
+    Untracked:  verbyla1999The analysis of designed experiments and longitudinal data by using smoothing splines.pdf
+    Untracked:  welham2004.pdf
+
+Unstaged changes:
+    Deleted:    Genomic_selection_wheat/Genomic_selection_wheat.Rproj
+    Deleted:    Genomic_selection_wheat/README.md
+    Deleted:    Genomic_selection_wheat/_workflowr.yml
+    Deleted:    Genomic_selection_wheat/analysis/_site.yml
+    Deleted:    Genomic_selection_wheat/analysis/about.Rmd
+    Deleted:    Genomic_selection_wheat/analysis/index.Rmd
+    Deleted:    Genomic_selection_wheat/analysis/license.Rmd
+    Deleted:    Genomic_selection_wheat/code/README.md
+    Deleted:    Genomic_selection_wheat/data/README.md
+    Deleted:    Genomic_selection_wheat/output/README.md
+    Modified:   spatial_analysis/README.md
+    Modified:   spatial_analysis/analysis/SingleLocSpatialLMMsovler.Rmd
+    Modified:   spatial_analysis/analysis/SingleLocSpatialSommer.Rmd
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+
+<p>
+These are the previous versions of the repository in which changes were
+made to the R Markdown
+(<code>Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/GP_Wheat_UCDavis/analysis/license.Rmd</code>)
+and HTML
+(<code>Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/GP_Wheat_UCDavis/docs/license.html</code>)
+files. If you’ve configured a remote Git repository (see
+<code>?wflow_git_remote</code>), click on the hyperlinks in the table
+below to view the files as they were in that past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="ssh://github.com:Tesfahun54/spatial_analysis_updated/blob/81e9ae6771990cdc0c57cf142400ca2926575e87/Genomic_selection_wheat/Genomic_prediction_services/UC_Davis_Breeding_program/GP_Wheat_UCDavis/analysis/license.Rmd" target="_blank">81e9ae6</a>
+</td>
+<td>
+<a href="https://github.com/Tesfahun54/UCDavis_Breeding_program"
+class="uri">https://github.com/Tesfahun54/UCDavis_Breeding_program</a>
+</td>
+<td>
+2024-02-13
+</td>
+<td>
+Start workflowr project.
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<p>What license are you using for your code? See <a
+href="https://choosealicense.com/">choosealicense.com</a> for help
+deciding. It’s a convention to save a file <code>LICENSE</code> in the
+root of your Git repo that contains the license text.</p>
+<p>What license are you using for the written content on your site? It
+is traditional to choose a <a
+href="https://creativecommons.org/choose/">Creative Commons</a> license
+for this type of content.</p>
+<p>How should others cite your work? It’s a convention to save a file
+<code>CITATION</code> in the root of your Git repo that contains the
+citation information.</p>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

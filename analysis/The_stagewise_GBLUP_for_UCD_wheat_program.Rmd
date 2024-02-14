@@ -1,0 +1,484 @@
+---
+title: "Stagewise GBLUP using sommer package"
+author: "Tesfahun A. Setotaw"
+date: "2024-02-10"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+if (!require("here")) install.packages("here")
+here::i_am("analysis/The_stagewise_GBLUP_for_UCD_wheat_program.Rmd")
+```
+
+## Stage wise GBLUP
+This is an alternative genomic prediction method using sommer package. This alternative is viable when we only have a genomic relationship matrix. In UCDAVIS breeding program since the gentpes are genotypes using two genotyping protocol we are not able to use the direct marker to fit in the stagewis package ( Endelman JB (2023)).Since the package requiered the snps marker data directly than the relationship matrix. 
+
+In our case we estimate for each genotyping protocol a genomic relationship matrix and combined using teh CovCombR package (eniz Akdemir and Julio Isidro Sanchez). Then use this as an imput for the final GBLUP prediction.
+
+
+
+```{r load important packages for analysis}
+
+# Load the necessary packages for the analysis
+library(StageWise)
+library(sommer)
+library(tibble)
+library(readr)
+library(openxlsx)
+library(asreml)
+library(genomicMateSelectR)
+library(tibble)
+```
+
+
+
+```{r import and arrange the phenotypic data }
+
+#Import the phenotypic data
+phdavis <- read.csv(here::here("data",
+             "phenotype_UCDavis_Bread_Wheat_Breeding_2020_2022_trials.csv"))
+head(phdavis)
+#change the factor variables as factor
+phdavis$studyName <- as.factor(phdavis$studyName)
+phdavis$germplasmName <- as.factor(phdavis$germplasmName)
+phdavis$replicate <- as.factor(phdavis$replicate)
+str(phdavis)
+
+#Traits to be analyzed 
+Traits <- c("Grain.yield...kg.ha.CO_321.0001218",
+            "Plant.height...cm.CO_321.0001301",
+            "Grain.test.weight...g.l.CO_321.0001210",
+            "Grain.weight...1000.kernels...g.1000.grain.CO_321.0001213",
+            "Heading.time...Julian.date..JD..CO_321.0001233",
+            "Grain.protein.content......CO_321.0001205")
+
+###### The name of the columns required by Stagewise package (env, id, loc)
+phdavis$loc <- phdavis$studyName # since we have only one location we can use the study Name 
+phdavis$env <- phdavis$studyName
+phdavis$id <-  phdavis$germplasmName
+
+```
+
+```{r import the SNP marker data and estimate the GRM (genomic relationship matrix)}
+####Import the SNps data from the two genotyping protocol (Allegro, and GBS) 
+
+#SNPs from Allegro - genotyping protocol
+Allegro_snps <- read_tsv(file = here::here("data",
+                  "SNPs_UCDavis_2020_Allegro_protocol_dosage.tsv"))
+
+dim(Allegro_snps)
+head(Allegro_snps[,1:10])
+Allegro_snps  <- as.data.frame(Allegro_snps) # change to data frame to use some commands 
+rownames(Allegro_snps) <- Allegro_snps$Marker # naming the row of the data
+Allegro_snps  <-  Allegro_snps[,-1]
+
+########impute the SNPs data and estimate the GRM
+Allegro_snps_t  <- t(Allegro_snps) # transpose the SNP data to make geno x marker format
+head(Allegro_snps_t[,1:10])
+
+# remove SNP marker if the NA values is >20%
+
+SNps_NA <-  c() # the number of number of columns for the marker 
+for(i in 1:ncol(Allegro_snps_t)){
+  if(length(which(is.na(Allegro_snps_t[,i]))) > 0.2 *nrow(Allegro_snps_t)){
+    SNps_NA = c(SNps_NA, i)
+  }
+}
+
+Allegro_snps_t1 <- Allegro_snps_t[,-SNps_NA] # removing the markers with NA values > 20%
+
+# filter based on MAF 
+library(genomicMateSelectR)
+Allegro_snps_t1_MAF <- maf_filter(M = Allegro_snps_t1, thresh = 0.05)
+dim(Allegro_snps_t1_MAF)
+
+#####
+# Estimate the GRM - for the Allegro genotyping protocol
+# imputing the markers using the mean values 
+missing_av <-  apply(X = Allegro_snps_t1_MAF, MARGIN = 2, FUN = mean, na.rm = T) # impute the data based on the average value 
+for(i in 1:ncol(Allegro_snps_t1_MAF)){
+  Allegro_snps_t1_MAF[is.na(Allegro_snps_t1_MAF[,i]), i] <- missing_av[i]
+}
+Allegro_snps_t1_MAF[1:10,1:10]
+
+G1 <-  kinship(M = Allegro_snps_t1_MAF, type = "add") # Kinship with the additive model 
+head(G1[1:10,1:10])
+
+
+#################################
+# Do the same analysis for the - GBS protocol
+
+GBS_snps <- read_tsv(file = here::here("data", "SNPs_UCDavis_UCD_2022GBS_V2__protocol_dosage.tsv"))
+
+dim(GBS_snps)
+head(GBS_snps[,1:10])
+GBS_snps <- as.data.frame(GBS_snps) # change to data frame to use some commands 
+rownames(GBS_snps) <- GBS_snps$Marker # naming the row of the data
+GBS_snps <- GBS_snps[,-1]
+
+########impute the SNPs data and estimate the GRM
+GBS_snps_t <- t(GBS_snps) # transpose the SNP data to make geno x marker format
+head(GBS_snps_t[,1:10])
+
+# remove SNP marker if the NA values is >20%
+
+SNps_NA <- c() # the number of number of columns for the marker 
+for(i in 1:ncol(GBS_snps_t)){
+  if(length(which(is.na(GBS_snps_t[,i]))) > 0.2 *nrow(GBS_snps_t)){
+    SNps_NA <- c(SNps_NA, i)
+  }
+}
+
+SNps_NA # in this case empty so 
+GBS_snps_t1 <- GBS_snps_t # removing the markers with NA values > 20%
+
+# filter based on MAF 
+GBS_snps_t1_MAF <- maf_filter(M = GBS_snps_t1, thresh = 0.05)
+dim(GBS_snps_t1_MAF)
+
+#####
+# Estimate the GRM - for the Allegro genotyping protocol
+missing_av <-  apply(X = GBS_snps_t1_MAF, MARGIN = 2, FUN = mean, na.rm = T) # impute the data based on the average value 
+for(i in 1:ncol(GBS_snps_t1_MAF)){
+  GBS_snps_t1_MAF[is.na(GBS_snps_t1_MAF[,i]), i] <- missing_av[i]
+}
+GBS_snps_t1_MAF[1:10,1:10]
+
+G2 <-  kinship(M = GBS_snps_t1_MAF, type = "add") # Kinship with the additive model 
+head(G2[1:10,1:10])
+
+############
+# Combine the two GRM 
+# Since we have two genotyping platform we can not merge directly instead we can merge the relationship matices
+
+library(CovCombR) # package to combine the matrices 
+comb_G <- list(G1,G2)
+Comb_GRM <- CovComb(comb_G) # This will merge the two matrices 
+
+#Save the combined GRM - for future use
+
+write.csv(x = Comb_GRM, file = here::here("data", "GRM_comb_UCD_add.csv")) # do it once
+
+# Read the combined relationship matrix saved 
+GRM_com_UCD <- read.csv(file = here::here("data", "GRM_comb_UCD_add.csv"))
+
+head(GRM_com_UCD[,1:10])
+rownames(GRM_com_UCD) <-  GRM_com_UCD$X
+GRM_com_UCD <-  GRM_com_UCD[,-1] # the combined genomic relationship matrix 
+head(GRM_com_UCD[,1:10])
+```
+
+# Classify the trials 
+Ther trials willbe classified as follow according to the data 
+
+1. Trials with replication 
+  1.1 Trial with spatial 
+  1.2 Trials without spatial
+2. unreplicated 
+
+
+
+```{r - Classifying the data - based on replication and spatial information}
+
+
+#####################
+# classifying the data
+## 
+##########
+
+env <- unique(phdavis$studyName) # the list of the studyName (Trials)
+
+################
+# classify the trials in replicated and unreplicated 
+# Generate table with the number of replication in each trials
+
+Norep_davis <-  tibble::tibble() # tibble to store the number of replication per trial
+for(trial in unique(phdavis$studyName)){
+  ph <-   phdavis[phdavis$studyName == trial,]
+  rp <-  length(unique(ph$replicate))
+  rp1 <-  cbind( Trial = trial, NO_rep = rp)
+  Norep_davis <-   rbind(Norep_davis,rp1)
+}
+
+# Based on the information divide the trials as replicated and unreplicated
+# select trial without replication 
+
+Trials_without_rep <- Norep_davis$Trial[which(Norep_davis$NO_rep == 1)] # number of replication =1 
+
+# Select trials with replication 
+Trials_with_rep <-unique(phdavis$studyName)[!unique(phdavis$studyName) %in% Trials_without_rep  ]
+
+########################################################
+# subset the data of replicated and un-replicated trials and save it for future use 
+
+Dat_wo_Rep <- droplevels(phdavis[phdavis$studyName %in% Trials_without_rep, ]) # Trial data without replication
+
+#Data with replication 
+Dat_with_Rep <- droplevels(phdavis[!phdavis$studyName %in% Trials_without_rep, ]) # Trial data with replication 
+
+################################
+# The trials with replication will further divided as
+# Trial with  with spatial and without spatial
+
+
+library(tibble)
+# Loop to select trials with row and column information 
+rowcl <-  tibble() 
+for(i in unique(Dat_with_Rep$env)){
+  dt <-  Dat_with_Rep[Dat_with_Rep$env == i, ]
+  leng1 <- length(which(is.na(dt$rowNumber)))
+  leng2 <- length(which(is.na(dt$colNumber)))
+  lll <- cbind(Trial = i, row = leng1, col = leng2) # The number of NA values for row and column information 
+  rowcl <-  rbind(rowcl, lll)
+}
+
+# Those trials with row and col with 0 values are , trials without spatial information 
+# Select Trial names with and without row and col information from the table 
+Trial_with_sp <-  rowcl$Trial[which(rowcl$row == 0)] # Trial without spatial information 
+Trial_wo_sp <-  rowcl$Trial[!rowcl$Trial %in% Trial_with_sp] # Trial with spatial information 
+
+
+######################
+# Subset the data with and without spatial inforamtion
+
+# The Data for Trial without spatial information (11 trials without spatial)
+Dat_w_Rep_wo_sp <- droplevels(Dat_with_Rep[Dat_with_Rep$studyName %in% Trial_wo_sp,] )
+unique(Dat_w_Rep_wo_sp$studyName)
+# Data for Trial with spatial information (8 trials with spatial )
+Dat_w_Rep_with_sp <-  droplevels(Dat_with_Rep[Dat_with_Rep$studyName %in% Trial_with_sp, ])
+unique(Dat_w_Rep_with_sp$studyName)
+
+
+
+```
+```{r - Estimate the BLUE and covariance for the trials without spatial information}
+
+#BLUE and covaraince estimation for Trials without spatial inforamtion
+
+Dat_w_Rep_wo_sp # data with rep but without spatial inforation 
+library(sommer)
+env1 <- droplevels(unique(Dat_w_Rep_wo_sp$studyName)) # Trial names without spatial information 
+BLUEL_without_sp <- list()
+XtXL_without_sp  <- list()
+for(i in env1){
+  dat1 <- droplevels(Dat_w_Rep_wo_sp[Dat_w_Rep_wo_sp$studyName == i,])
+  TraitN <- colnames(dat1[Traits])[colSums(is.na(dat1[Traits])) < 0.5 * dim(dat1)[1]] # selecting the trait without NA
+  
+  dat2 <- dat1[,c("replicate","id",TraitN)]
+
+  for(Trait1 in TraitN){
+  eval(parse(text = paste("ans1 <- mmer(",Trait1,"~ id -1,
+               random=~replicate,
+               verbose=FALSE,
+               data=dat2)")))
+  ans1$Beta$Env <- i
+  ans1$Beta$Effect <-  gsub(pattern = "id",replacement = "", x = ans1$Beta$Effect)
+  BLUEL_without_sp[[Trait1]][[i]] <- ans1$Beta
+  # to be comparable to 1/(se^2) = 1/PEV = 1/Ci = 1/[(X'X)inv]
+  XtXL_without_sp[[Trait1]][[i]] <- solve(ans1$VarBeta) 
+}
+}
+BLUEL_without_sp # The BLUE values 
+XtXL_without_sp # the covariance matrix 
+```
+
+# Estiamte the BLUE and covariance matrix of trials with spatial information 
+```{r Estimate BLUE and covariance for the trials with spatial inforamtion }
+Dat_w_Rep_with_sp # the data
+
+env2 <- unique(Dat_w_Rep_with_sp$studyName) # Trial names with spatial inforamtion 
+BLUEL_with_sp <- list()
+XtXL_with_sp  <- list()
+for(i in env2){
+  dat1 <- droplevels(Dat_w_Rep_with_sp[Dat_w_Rep_with_sp$studyName == i,])
+  TraitN <- colnames(dat1[Traits])[colSums(is.na(dat1[Traits])) < 0.5 * dim(dat1)[1]] # selecting the trait without NA
+  
+  dat2 <- dat1[,c("replicate","id",TraitN,"rowNumber", "colNumber" )]
+  
+  for(Trait1 in TraitN){
+    eval(parse(text = paste("ans4 <- mmer(",Trait1,"~ id -1,
+               random=~replicate + spl2Da(rowNumber, colNumber) ,
+               verbose=FALSE,
+               data=dat2)")))
+    ans4$Beta$Env <- i
+    ans4$Beta$Effect <- gsub(pattern = "id", replacement = "", x = ans4$Beta$Effect)
+    BLUEL_with_sp[[Trait1]][[i]] <- ans4$Beta
+
+    # to be comparable to 1/(se^2) = 1/PEV = 1/Ci = 1/[(X'X)inv]
+    XtXL_with_sp[[Trait1]][[i]] <- solve(ans4$VarBeta)
+  }
+}
+
+```
+
+# Single replicated trial analysis
+For trials with single rep to get the BLUP and the covariance among means GBLUP analysis was done using the marker inforamtion. 
+```{r single replicated trial analysis }
+
+#########################
+# single - rep trials 
+
+Dat_wo_Rep
+
+ unique(Dat_wo_Rep$studyName) # Trial names without replication (2 trials)
+#Relationship matrix 
+
+ ##########
+ # Determine the number of genotyeps with marker data in each trials (Trials without replication)
+ No_gen_unrep <-  tibble()
+ for(i in unique(Dat_wo_Rep$studyName)){
+  ddd <- Dat_wo_Rep[Dat_wo_Rep$studyName == i,] 
+  ln <- length(which(ddd$id %in% rownames(GRM_com_UCD) ))
+ ln1 <-   cbind(Trial = i, Nogen = ln)
+  No_gen_unrep <-  rbind(No_gen_unrep,ln1)
+}
+
+##
+# Since the number of genotype in UCD21015 with marker data is 4, too small we removed form further analysis
+ # The analysis only done for trial UCD21014
+ DatUCD21014 <-  droplevels(Dat_wo_Rep[Dat_wo_Rep$studyName == "UCD21014", ])
+ idx <-  which(DatUCD21014$id %in% rownames(GRM_com_UCD)) # index the genotypes with SNP marker data
+ DatUCD21014A <-  DatUCD21014[idx,] # subset the genotypes
+ idm <- which(rownames(GRM_com_UCD) %in% DatUCD21014A$id) # subset genotypes within the relationship matrix 
+ GRM_com_UCD_UCD21014  <-  GRM_com_UCD[idm, idm]
+ 
+ GRM_com_UCD_UCD21014 <-  as.matrix(GRM_com_UCD_UCD21014) # change to matrix 
+ BLUEL_woRep_Wosp <- list()
+ XtXL_woRep_Wosp  <- list()
+ for(i in unique(DatUCD21014A$studyName)){
+   dat1 <- droplevels(DatUCD21014A[DatUCD21014A$studyName == i,])
+   TraitN <-  colnames(dat1[Traits])[colSums(is.na(dat1[Traits])) < 0.5 * dim(dat1)[1]] # selecting the trait without NA
+   
+   dat2 <- dat1[,c("replicate","id",TraitN,"rowNumber", "colNumber" )]
+   
+   for(Trait1 in TraitN[-3]){
+     eval(parse(text = paste("ans5 <- mmer(",Trait1,"~1,
+               random=~vsr(id,Gu = GRM_com_UCD_UCD21014) ,
+               verbose=FALSE,
+               data=dat2)")))
+     ans5$Beta$Env <- i
+     blue <- as.data.frame(ans5$U$`u:id`[[1]])
+     colnames(blue) <-  "Estimate"
+     blue1 <- cbind(Trait = Trait1, Effect = rownames(blue), blue)
+     rownames(blue1) <-  NULL
+     blue1$Estimate <-  blue1$Estimate + ans5$Beta[["Estimate"]]
+     blue1$Env <-  "UCD21014"
+     BLUEL_woRep_Wosp[[Trait1]][[i]] <- blue1
+     # to be comparable to 1/(se^2) = 1/PEV = 1/Ci = 1/[(X'X)inv]
+     XtXL_woRep_Wosp[[Trait1]][[i]] <- solve(ans5$PevU$`u:id`[[1]]) 
+   }
+ }
+```
+# Combining the estimaed BLUE and covariance matrices
+We will collect all the BlUE and covariance matrices estimaed in the above section and organize along the trait. 
+```{r - combine the BLUEs and Covariances in one list file for each Trait}
+####################################
+
+
+BLUE_combNew <-  list() # to store the combined blues 
+XtXL_CombNew <- list() # to store the combined covariances 
+
+for(Trait in Traits){
+ 
+ bcov <- c(XtXL_without_sp[[Trait]], XtXL_with_sp[[Trait]], 
+          XtXL_woRep_Wosp[[Trait]])
+
+ bbblue <- c(BLUEL_without_sp[[Trait]], BLUEL_with_sp[[Trait]],
+             BLUEL_woRep_Wosp[[Trait]])
+ BLUE_combNew[[Trait]] <- bbblue
+ XtXL_CombNew[[Trait]] <- bcov
+}
+
+```
+# Stage2 BLUE estiamtion 
+Using the estimaed BLUE and covariance matrix, the final BLUE values will be estiamted. This BLUE mean will be used for the genomic prediction.
+```{r - Stage2 BLUE mean estimation }
+###################################################################################
+# An alternative to Stagewise package - in the absence of common genotyping protocol
+# Sommer package used to estimate the BLUE mean using the co-variacne structure 
+
+BLUE_2stage <-  tibble() # stor the BLUE
+
+for(Trait in Traits){
+ BLUEtrt <- BLUE_combNew[[Trait]]
+ BLUEtrt_long <- do.call(rbind,BLUEtrt) # combine all the means from different trials 
+
+ XtXL_trt <- XtXL_CombNew[[Trait]] 
+ XtXL_trt_long <- do.call(adiag1, XtXL_trt) # combiene all the vcovs from different trials 
+ 
+idph <-  which(BLUEtrt_long$Effect %in% rownames(GRM_com_UCD)) # identify genotypes with marker data 
+BLUEtrt_long_sel <-  BLUEtrt_long[idph, ] # select Blue mean with marker data 
+
+XtXL_trt_long_sel <- XtXL_trt_long[idph, idph] # select cov with marker data 
+dim(XtXL_trt_long_sel)
+## use mmec for sparse equation
+##########
+
+BLUEtrt_long_sel$Effect <-  as.factor(BLUEtrt_long_sel$Effect) # change to factor 
+BLUEtrt_long_sel$Env <-  as.factor(BLUEtrt_long_sel$Env) # change to factor
+
+GRM_com_UCD <-  as.matrix(GRM_com_UCD)
+GRM_com_UCD <-  as(GRM_com_UCD, Class = "dgCMatrix")
+
+m <- matrix(1/var(BLUEtrt_long_sel$Estimate, na.rm = TRUE))
+
+ans2 <- mmec(Estimate~Env,
+             random=~Effect + Env:Effect, 
+             rcov=~vsc(isc(units,thetaC = matrix(3), theta = m)),
+             W=XtXL_trt_long_sel, 
+             verbose=FALSE,
+             data=BLUEtrt_long_sel
+)
+ans2$Dtable
+prd <- predict.mmec(object = ans2, D = "Effect")
+prd1 <- cbind(Trait = Trait, prd$pvals)
+rownames(prd1) = NULL
+
+BLUE_2stage <-  rbind(BLUE_2stage, prd1)
+
+}
+```
+```{r - Final stage - GBLUP prediction}
+####################################
+# Genomic prediction - stage3
+####################################
+head(BLUE_2stage)
+library(reshape2)
+BLUE_2stage_wide <-  dcast(data = BLUE_2stage, formula = Effect ~Trait, fun.aggregate = mean,
+                         na.rm = T, value.var = "predicted.value")
+dim(BLUE_2stage_wide)
+str(BLUE_2stage_wide)
+BLUE_2stage_wide$Effect <-  as.factor(BLUE_2stage_wide$Effect)
+GRM_com_UCD <-  as.matrix(GRM_com_UCD) # Genetic relationship matrix
+
+
+rownames(GRM_com_UCD) %in% BLUE_2stage_wide$Effect
+
+head(BLUE_2stage_wide)
+GBLUP_combined <-  tibble() # container to store the GEBV values 
+for(Trait in Traits){
+  BLUE_adj <- BLUE_2stage_wide[,c("Effect",Trait)] # subset the data for each trait
+  eval(parse(text = paste(
+  "mix1 <- mmer(",Trait," ~1,
+                random=~vsr(Effect, Gu=GRM_com_UCD),
+                rcov=~units,
+                data=BLUE_adj)"
+  )))
+  prd_GBLUP <- predict.mmer(object = mix1, D = "Effect")
+  prd_GBLUP1 <-  cbind(Trait = Trait, prd_GBLUP$pvals)
+  
+  GBLUP_combined <-  rbind(GBLUP_combined,prd_GBLUP1)
+}
+
+GBLUP_combined_wide <-  dcast(GBLUP_combined, formula = Effect ~ Trait, fun.aggregate = mean,
+                            value.var = "predicted.value", na.rm = T
+                            )
+head(GBLUP_combined_wide)
+colnames(GBLUP_combined_wide)[1] <-  "germplasmName"
+
+write.csv(x = Comb_GRM, file = here::here("output", "GBLUP_prediction_for_UCDVIS_All_Traits.csv"), row.names = F) # write the GEBV values
+
+```
+
+
